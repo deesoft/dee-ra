@@ -1,0 +1,36 @@
+{
+    "name": "deesoft/yii2-biz3distro",
+    "description": "Simple ERP",
+    "keywords": ["yii2", "framework", "advanced", "project template"],
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/deesoft/yii2-app-single/issues?state=open",
+        "source": "https://github.com/deesoft/yii2-app-single"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": ">=2.0.7",
+        "yiisoft/yii2-swiftmailer": "~2.0",
+        "deesoft/yii2-console": "~1.0",
+        "deesoft/yii2-tools": "~1.0",
+        "mdmsoft/yii2-autonumber": "~1.0",
+        "mdmsoft/yii2-format-converter": "~1.0",
+        "mdmsoft/yii2-upload-file": "~1.0",
+        "mdmsoft/yii2-ar-behaviors": "~1.0"
+    },
+    "require-dev": {
+        "yiisoft/yii2-debug": "~2.0",
+        "deesoft/yii2-gii": "~1.0"
+    },
+    "config": {
+        "process-timeout": 1800
+    },
+    "extra": {
+        "asset-installer-paths": {
+            "npm-asset-library": "vendor/npm",
+            "bower-asset-library": "vendor/bower"
+        }
+    }
+}
