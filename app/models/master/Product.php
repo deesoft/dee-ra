@@ -36,24 +36,26 @@ use app\models\sales\Price;
  * @property ProductUom[] $productUoms
  * @property Uom[] $uoms
  */
-class Product extends \yii\db\ActiveRecord {
+class Product extends \yii\db\ActiveRecord
+{
 
     use \mdm\converter\EnumTrait;
-
     const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 0;
 
     /**
      * @inheritdoc
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'product';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['group_id', 'category_id', 'code', 'name', 'status'], 'required'],
             [['group_id', 'category_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
@@ -68,7 +70,8 @@ class Product extends \yii\db\ActiveRecord {
     /**
      * @inheritdoc
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'id' => 'ID',
             'group_id' => 'Group ID',
@@ -88,92 +91,113 @@ class Product extends \yii\db\ActiveRecord {
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCogs() {
+    public function getCogs()
+    {
         return $this->hasOne(Cogs::className(), ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPrices() {
+    public function getPrices()
+    {
         return $this->hasMany(Price::className(), ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPriceCategories() {
+    public function getPriceCategories()
+    {
         return $this->hasMany(PriceCategory::className(), ['id' => 'price_category_id'])->viaTable('price', ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory() {
+    public function getCategory()
+    {
         return $this->hasOne(Category::className(), ['id' => 'category_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getGroup() {
+    public function getGroup()
+    {
         return $this->hasOne(ProductGroup::className(), ['id' => 'group_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProductChildren() {
+    public function getProductChildren()
+    {
         return $this->hasMany(ProductChild::className(), ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProductStocks() {
+    public function getProductStocks()
+    {
         return $this->hasMany(ProductStock::className(), ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getWarehouses() {
+    public function getWarehouses()
+    {
         return $this->hasMany(Warehouse::className(), ['id' => 'warehouse_id'])->viaTable('product_stock', ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProductVendors() {
+    public function getProductVendors()
+    {
         return $this->hasMany(ProductVendor::className(), ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getVendors() {
+    public function getVendors()
+    {
         return $this->hasMany(Vendor::className(), ['id' => 'vendor_id'])->viaTable('product_vendor', ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProductUoms() {
+    public function getProductUoms()
+    {
         return $this->hasMany(ProductUom::className(), ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUoms() {
+    public function getUoms()
+    {
         return $this->hasMany(Uom::className(), ['id' => 'uom_id'])->viaTable('product_uom', ['product_id' => 'id']);
     }
 
-    public function getNmStatus() {
+    public function getNmStatus()
+    {
         return $this->getLogical('status', 'STATUS_');
     }
 
-    public function behaviors() {
+    public function getNmCategory()
+    {
+        if (($category = $this->category) !== null) {
+            return $category->name;
+        }
+    }
+
+    public function behaviors()
+    {
         return [
             [
                 'class' => 'mdm\converter\DateConverter',
@@ -187,5 +211,4 @@ class Product extends \yii\db\ActiveRecord {
             ['class' => BlameableBehavior::className()]
         ];
     }
-
 }

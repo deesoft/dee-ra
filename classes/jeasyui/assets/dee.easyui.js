@@ -7,7 +7,7 @@
             'layout', 'panel', 'datagrid', 'propertygrid', 'treegrid', 'datalist', 'tabs', 'accordion', 'window', 'dialog', 'form'
         ],
         remotePlugins: ['datagrid', 'combobox'],
-        datePlugins: ['calender', 'datebox'],
+        datePlugins: ['calendar', 'datebox'],
         defaultMethod: 'get',
         // date formatter
         dateFormatter: function (date) {
@@ -33,12 +33,23 @@
     };
 
     for (var i = 0; i < defaults.remotePlugins.length; i++) {
-        $.fn[defaults.remotePlugins[i]].defaults.method = defaults.defaultMethod;
+        var plugin = defaults.remotePlugins[i];
+        $.fn[plugin].defaults.method = defaults.defaultMethod;
     }
 
     for (var i = 0; i < defaults.datePlugins.length; i++) {
-        $.fn[defaults.datePlugins[i]].defaults.formatter = defaults.dateFormatter;
-        $.fn[defaults.datePlugins[i]].defaults.parser = defaults.dateParser;
+        var plugin = defaults.datePlugins[i];
+        $.fn[plugin].defaults.formatter = defaults.dateFormatter;
+        $.fn[plugin].defaults.parser = defaults.dateParser;
     }
+
+    $.extend($.fn.validatebox.methods, {
+        addCustomInvalid: function (jq, message) {
+            return jq.each(function () {
+                $.data(this, 'validatebox').message = message;
+                $(this).addClass('validatebox-invalid');
+            });
+        }
+    });
 
 })(jQuery);

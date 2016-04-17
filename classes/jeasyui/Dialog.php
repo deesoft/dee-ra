@@ -3,12 +3,14 @@
 namespace classes\jeasyui;
 
 /**
- * Description of Html
+ * Description of DataGrid
  *
  * @author Misbahul D Munir <misbahuldmunir@gmail.com>
  * @since 1.0
  */
-class Html extends BaseHtml
+class Dialog extends Widget
 {
-    
+    public $tag = 'div';
+    protected $plugin = 'dialog';
+
 }

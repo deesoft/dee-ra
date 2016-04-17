@@ -15,10 +15,10 @@ class EasyuiAsset extends AssetBundle
     public $sourcePath = '@classes/jeasyui/assets';
     public $js = [
         'jquery.easyui.min.js',
+        'dee.searchbox.js',
+        'dee.easyui.js'
     ];
     public $css = [
-        'kube.css',
-        'main.css',
         'main' => 'themes/default/easyui.css',
         'themes/icon.css',
         'themes/color.css',

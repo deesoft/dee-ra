@@ -17,30 +17,6 @@ EasyuiAsset::register($this);
         <?= Html::csrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
-        <style type="text/css">
-            .tree-title{
-                font-size: 14px;
-            }
-            .tree-title a{
-                text-decoration: none;
-            }
-            #head-menu{
-                position: absolute;
-                z-index: 8;
-                display: none;
-                background: #2d3e50;
-                color: #fff;
-                left: 0;
-                padding: 0 4.5%;
-                top: 66px;
-            }
-            #head-menu .navbar{
-                margin: 0 40px 20px 40px;
-            }
-            #head-menu a{
-                color: #fff;
-            }
-        </style>
     </head>
     <body class="easyui-layout" style="text-align:left">
         <?php $this->beginBody() ?>
