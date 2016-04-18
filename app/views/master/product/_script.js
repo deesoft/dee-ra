@@ -1,9 +1,9 @@
 
 $('#srch').dsearchbox({
     data: [
-        {field: 'code'},
+        {field: 'code',},
         {field: 'name'},
-        {field: 'nmCategory', op: 'bt'}
+        {field: 'category.name', title: 'Category'}
     ],
     panelHeight: 'auto',
     value: {},
@@ -13,7 +13,7 @@ $('#srch').dsearchbox({
 });
 
 $('#btn-vbox').linkbutton({
-    onClick:function(){
-        $('#vbox').textbox('addCustomInvalid','My message');
+    onClick: function () {
+        $('#vbox').textbox('addCustomInvalid', 'My message');
     }
 });

@@ -44,15 +44,15 @@ class ProductController extends Controller
     public function actionData()
     {
         $serializer = $this->serializer;
-        $serializer->setExpands(['nmCategory', 'nmStatus', 'category']);
+        $serializer->setExpands(['nmStatus', 'category']);
         $serializer->setExceptField(['*.created_at']);
         $serializer->fieldMap = [
-            'nmCategory' => 'ct.name',
+            
         ];
         $serializer->setFilter(Yii::$app->getRequest()->get('q', []));
         $query = Product::find()
             ->alias('p')
-            ->joinWith(['category ct']);
+            ->joinWith('category');
 
         return $query;
     }

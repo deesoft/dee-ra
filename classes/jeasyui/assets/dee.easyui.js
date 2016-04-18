@@ -1,15 +1,12 @@
 (function ($) {
-    var defaults = {
-        plugins: ['draggable', 'droppable', 'resizable', 'pagination', 'tooltip',
-            'linkbutton', 'menu', 'menubutton', 'splitbutton', 'switchbutton', 'progressbar',
-            'tree', 'textbox', 'filebox', 'combo', 'combobox', 'combotree', 'combogrid', 'numberbox', 'validatebox', 'searchbox',
-            'spinner', 'numberspinner', 'timespinner', 'datetimespinner', 'calendar', 'datebox', 'datetimebox', 'slider',
-            'layout', 'panel', 'datagrid', 'propertygrid', 'treegrid', 'datalist', 'tabs', 'accordion', 'window', 'dialog', 'form'
-        ],
-        remotePlugins: ['datagrid', 'combobox'],
-        datePlugins: ['calendar', 'datebox'],
-        defaultMethod: 'get',
-        // date formatter
+
+    $.fn.deeEasyui = function () {};
+
+    $.fn.deeEasyui.defaults = {
+        method: 'get',
+    };
+
+    $.fn.deeEasyui.methods = {
         dateFormatter: function (date) {
             var y = date.getFullYear();
             var m = date.getMonth() + 1;
@@ -29,22 +26,37 @@
             } else {
                 return new Date();
             }
+        },
+        getValue: function (obj, field) {
+            if (!$.isArray(obj) && !$.isPlainObject(obj)) {
+                return undefined;
+            }
+            if (typeof obj[field] != 'undefined') {
+                return obj[field];
+            }
+            var p = field.lastIndexOf('.');
+            if (p > 0) {
+                var f = field.substr(p + 1);
+                field = field.substr(0, p);
+                obj = $.fn.deeEasyui.methods.getValue(obj, field);
+                return $.isArray(obj) || $.isPlainObject(obj) ? obj[f] : undefined;
+            }
+            return undefined;
         }
     };
 
-    for (var i = 0; i < defaults.remotePlugins.length; i++) {
-        var plugin = defaults.remotePlugins[i];
-        $.fn[plugin].defaults.method = defaults.defaultMethod;
-    }
+    // remote method
+    $.fn.datagrid.defaults.method = $.fn.deeEasyui.defaults.method;
+    $.fn.combobox.defaults.method = $.fn.deeEasyui.defaults.method;
 
-    for (var i = 0; i < defaults.datePlugins.length; i++) {
-        var plugin = defaults.datePlugins[i];
-        $.fn[plugin].defaults.formatter = defaults.dateFormatter;
-        $.fn[plugin].defaults.parser = defaults.dateParser;
-    }
+    // date format and parser
+    $.fn.datebox.defaults.formatter = $.fn.deeEasyui.methods.dateFormatter;
+    $.fn.datebox.defaults.parser = $.fn.deeEasyui.methods.dateParser;
 
+
+    // Add custom to validation on the fly
     $.extend($.fn.validatebox.methods, {
-        addCustomInvalid: function (jq, message) {
+        addCustomError: function (jq, message) {
             return jq.each(function () {
                 $.data(this, 'validatebox').message = message;
                 $(this).addClass('validatebox-invalid');

@@ -10,40 +10,64 @@
     /**
      * set values
      */
-    function setValue(target, values) {
+    function setValue(target, values, change) {
         var state = $.data(target, 'dsearchbox');
         var panel = $(target).combo('panel');
         var inputs = state.inputs;
 
-        panel.find('input[dfield]').val('');
+        if (change) {
+            panel.find('input[field]').val('');
+        }
         var vv = values || {};
         var ss = [];
+        var prefixs = ['!==', '!=', '>=', '<=', '>', '<', '==', '='];
         $.each(vv, function (f, v) {
-            var tr = panel.find('tr[dfield="' + f + '"]');
-            var op = tr.attr('dop');
-            var s = f;
-            if (op == 'bt') {
-                s += '{';
-            } else if (op == 'nbt') {
-                s += '![';
-            } else {
-                s += op;
+            var tr = panel.find('tr[field="' + f + '"]');
+            var op = tr.attr('operator');
+            if (!op) {
+                op = v.op;
             }
-            var nv = {op: op};
+            var nv = {};
             if (typeof v == 'object') {
                 nv.v = v.v;
                 nv.v2 = v.v2;
             } else {
                 nv.v = v;
             }
+            if (!op && nv.v) {
+                for (var i = 0; i < prefixs.length; i++) {
+                    if (nv.v.indexOf(prefixs[i]) === 0) {
+                        op = prefixs[i];
+                        nv.v = nv.v.substr(prefixs[i].length);
+                        break;
+                    }
+                }
+            }
+            
+            if (op) {
+                nv.op = op;
+            }
+
+            var s = f;
+            if (op == '[]') {
+                s += '[';
+            } else if (op == '[]') {
+                s += '![';
+            } else {
+                s += (op || '=');
+            }
 
             if (nv.v) {
                 s += encodeURIComponent(nv.v);
-                tr.find('input[dfield="v"]')[inputs[f].type]('setValue', nv.v);
+                if (change) {
+                    tr.find('input[field="v"]')[inputs[f].type]('setValue', nv.v);
+                }
             }
-            if (op == 'bt' || op == 'nbt') {
+            if (op == '[]' || op == '![]') {
                 s += ':' + encodeURIComponent(nv.v2) + ']';
-                tr.find('input[dfield="v2"]')[inputs[f].type]('setValue', nv.v2);
+                if (change) {
+                    tr.find('input[field="v2"]')[inputs[f].type]('setValue', nv.v2);
+                }
             }
             ss.push(s);
             vv[f] = nv;
@@ -63,7 +87,7 @@
         var panel = $(target).combo('panel');
         render(target, panel, state.data);
 
-        setValue(target, opts.value);
+        setValue(target, opts.value, true);
         opts.onLoadSuccess.call(target, data);
     }
 
@@ -75,6 +99,7 @@
         var ff = {};
         var inputs = {};
         var inpType, inpOpts;
+        var width;
         tb.push('<table style="width:100%"><tbody>');
         for (var i = 0; i < data.length; i++) {
             var row = data[i];
@@ -83,11 +108,11 @@
                 continue;
             }
             ff[f] = true;
-            var op = row.op || '=';
+            var opAttr = (row.op) ? 'operator="' + row.op + '"' : '';
 
-            var tr = '<tr dfield="' + f + '" dop="' + op + '">';
+            var tr = '<tr field="' + f + '"' + opAttr + '>';
             tr += '<th>' + (row.title ? row.title : f) + '</th>';
-            tr += '<td>' + (row.op || '&nbsp;') + '</td><td>';
+            tr += '<th>' + (row.op || '&nbsp;') + '</th><td>';
 
             if (row.input) {
                 if (typeof row.input == 'string') {
@@ -102,21 +127,23 @@
                 inpOpts = {};
             }
 
-            tr += '<input dfield="v" >';
-            if (op == 'bt') {
-                tr += '<br><input dfield="v2" >';
+            tr += '<input field="v" >';
+            width = 200;
+            if (row.op == '[]' || row.op == '![]') {
+                tr += ' <input field="v2" >';
+                width = 140;
             }
             tr += '</td>';
             tb.push(tr);
 
             inputs[f] = ({
                 type: inpType,
-                options: inpOpts,
+                options: $.extend({width: width}, inpOpts),
             });
 
         }
         tb.push('<tr><th colspan="2">&nbsp;</th><td>');
-        tb.push('<a dbtn="search" ></a>&nbsp;<a dbtn="cancel" ></a>');
+        tb.push('<a action="search" ></a>&nbsp;<a action="cancel" ></a>');
 
         tb.push('</td></tr></tbody></table>');
 
@@ -124,21 +151,19 @@
         co.html(tb.join(''));
 
         $.each(inputs, function (f, inp) {
-            var sel = 'tr[dfield="' + f + '"] input[dfield]';
-            co.find(sel)[inp.type]($.extend({}, {
-                width: 200,
-            }, inp.options));
+            var sel = 'tr[field="' + f + '"] input[field]';
+            co.find(sel)[inp.type]($.extend({}, inp.options));
         });
 
         // button
-        co.find('a[dbtn="search"]').linkbutton($.extend({}, {
+        co.find('a[action="search"]').linkbutton($.extend({}, {
             iconCls: 'icon-search',
         }, opts.buttonSearchOptions, {
             onClick: function () {
                 doEnter(target);
             }
         }));
-        co.find('a[dbtn="cancel"]').linkbutton($.extend({}, {
+        co.find('a[action="cancel"]').linkbutton($.extend({}, {
             iconCls: 'icon-cancel',
         }, opts.buttonCancelOptions, {
             onClick: function () {
@@ -156,19 +181,19 @@
         var inputs = state.inputs;
 
         var vv = {};
-        panel.find('tr[dfield]').each(function () {
+        panel.find('tr[field]').each(function () {
             var tr = $(this);
-            var f = tr.attr('dfield');
+            var f = tr.attr('field');
 
             var v = {
-                op: tr.attr('dop')
+                op: tr.attr('operator')
             };
-            tr.find('input[dfield]').each(function () {
-                v[$(this).attr('dfield')] = $(this)[inputs[f].type]('getValue');
+            tr.find('input[field]').each(function () {
+                v[$(this).attr('field')] = $(this)[inputs[f].type]('getValue');
             });
             vv[f] = v;
         });
-        setValue(target, vv);
+        setValue(target, vv, false);
 
         t.dsearchbox('hidePanel');
         opts.onChangeValue.call(target, vv);
@@ -240,7 +265,7 @@
         },
         setValue: function (jq, values) {
             return jq.each(function () {
-                setValue(this, values);
+                setValue(this, values, true);
             });
         },
         getValue: function (jq) {
@@ -250,7 +275,7 @@
             return jq.each(function () {
                 $(this).combo('clear');
                 var panel = $(this).combo('panel');
-                panel.find('input[dfield]').val('');
+                panel.find('input[field]').val('');
                 $.data(this, 'dsearchbox').options.value = {};
             });
         },

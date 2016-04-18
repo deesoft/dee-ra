@@ -17,7 +17,7 @@ DataGrid::widget([
     'columns' => [
         ['field' => 'code', 'title' => 'Code', 'sortable' => true],
         ['field' => 'name', 'title' => 'Name', 'sortable' => true],
-        ['field' => 'nmCategory', 'title' => 'Category', 'sortable' => true],
+        ['field' => 'category.name', 'title' => 'Category', 'sortable' => true],
         'nmStatus'
     ],
     'clientOptions' => [

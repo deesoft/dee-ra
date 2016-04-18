@@ -47,6 +47,8 @@ class SerializeFilter extends ActionFilter
      * @var boolean
      */
     public $onlyAjax = true;
+    public $meta;
+    public $envelope = 'rows';
     /**
      *
      * @var array expanded field
@@ -186,13 +188,25 @@ class SerializeFilter extends ActionFilter
         }
 
         $models = $this->serializeModels($query->all());
+        $meta = [
+            'status' => 'success',
+        ];
         if (isset($total)) {
-            return [
-                'total' => $total,
-                'rows' => $models,
-            ];
+            $meta['total'] = $total;
         }
-        return $models;
+        $result = [];
+        if ($this->envelope) {
+            if ($this->meta) {
+                $result[$this->meta] = $meta;
+            } else {
+                $result = $meta;
+            }
+            $result[$this->envelope] = $models;
+        } else {
+            $result = $models;
+        }
+
+        return $result;
     }
 
     /**
@@ -279,8 +293,6 @@ class SerializeFilter extends ActionFilter
             '!=' => 'NOT LIKE',
             '==' => '=',
             '!==' => '<>',
-            'bt' => 'BETWEEN',
-            'nbt' => 'NOT BETWEEN',
         ];
         foreach ($this->_q as $field => $value) {
             if (empty($value)) {
@@ -307,14 +319,14 @@ class SerializeFilter extends ActionFilter
 
             $operator = isset($opMap[$op]) ? $opMap[$op] : $op;
             switch ($operator) {
-                case 'BETWEEN':
-                case 'NOT BETWEEN':
+                case '[]':
+                case '![]':
                     if ($v !== '' && $v2 !== '') {
-                        $query->andWhere([$operator, $field, $v, $v2]);
+                        $query->andWhere([$operator == '[]' ? 'BETWEEN' : 'NOT BETWEEN', $field, $v, $v2]);
                     } elseif ($v !== '' && $v2 === '') {
-                        $query->andWhere([$operator == 'BETWEEN' ? '>=' : '<', $field, $v]);
+                        $query->andWhere([$operator == '[]' ? '>=' : '<', $field, $v]);
                     } elseif ($v === '' && $v2 !== '') {
-                        $query->andWhere([$operator == 'BETWEEN' ? '<=' : '>', $field, $v2]);
+                        $query->andWhere([$operator == '[]' ? '<=' : '>', $field, $v2]);
                     }
                     break;
                 default:
