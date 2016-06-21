@@ -3,12 +3,9 @@
 namespace app\models\accounting;
 
 use Yii;
-use yii\helpers\ArrayHelper;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "acc_periode".
+ * This is the model class for table "{{%acc_periode}}".
  *
  * @property integer $id
  * @property string $name
@@ -22,26 +19,23 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property GlHeader[] $glHeaders
  */
-class AccPeriode extends \yii\db\ActiveRecord {
-
-    use \mdm\converter\EnumTrait;
-
-    const STATUS_OPEN = 10;
-    const STATUS_CLOSE = 20;
-
+class AccPeriode extends \app\classes\ActiveRecord
+{
     /**
      * @inheritdoc
      */
-    public static function tableName() {
-        return 'acc_periode';
+    public static function tableName()
+    {
+        return '{{%acc_periode}}';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
-            [['name', 'date_from', 'date_to', 'DateFrom', 'DateTo', 'status'], 'required'],
+            [['name', 'date_from', 'date_to', 'status'], 'required'],
             [['date_from', 'date_to'], 'safe'],
             [['status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
             [['name'], 'string', 'max' => 32],
@@ -51,7 +45,8 @@ class AccPeriode extends \yii\db\ActiveRecord {
     /**
      * @inheritdoc
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'id' => 'ID',
             'name' => 'Name',
@@ -68,101 +63,8 @@ class AccPeriode extends \yii\db\ActiveRecord {
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getGlHeaders() {
+    public function getGlHeaders()
+    {
         return $this->hasMany(GlHeader::className(), ['periode_id' => 'id']);
     }
-
-    public function getNmStatus() {
-        return $this->getLogical('status', 'STATUS_');
-    }
-
-    public static function find() {
-        return new AccPeriodeQuery(get_called_class());
-    }
-
-    public static function selectOptions($type = 'open') {
-        return ArrayHelper::map(static::find()->$type()->asArray()->all(), 'id', 'name');
-    }
-
-    public function beforeSave($insert) {
-        parent::beforeSave($insert);
-        //Insert New Record
-        if ($this->isNewRecord) {
-            $this->status = self::STATUS_OPEN;
-            return true;
-        }
-
-        $oldPeriode = $this->findOne($this->id);
-
-        //Closing
-        if ($this->status == self::STATUS_CLOSE && $oldPeriode->status == self::STATUS_OPEN) {
-            $cekBfor = $this->find()->where('status=:dstatus AND id<:did', [':dstatus' => self::STATUS_OPEN, ':did' => $this->id])->one();
-            if ($cekBfor) {
-                $this->status = $oldPeriode->status;
-                $this->addError('status', 'Periode hanya dapat ditutup secara berurutan.');
-
-                return false;
-            } else {
-                //CLI Call closing function...
-                return $this->closePeriode($this->attributes);
-            }
-        }
-
-        //Cancel Closing
-        if ($this->status == self::STATUS_OPEN && $oldPeriode->status == self::STATUS_CLOSE) {
-            $cekAfter = $this->find()->where('status=:dstatus AND id>:did', [':dstatus' => self::STATUS_CLOSE, ':did' => $this->id])->one();
-            if ($cekAfter) {
-                $this->status = $oldPeriode->status;
-                $this->addError('status', 'Periode yang telah ditutup hanya dapat dibatalkan jika periode sesudahnya masih open.');
-
-                return false;
-            } else {
-                //CLI Call cancel closing function...
-                return $this->cancelClosing($this->attributes);
-            }
-        }
-        return true;
-    }
-
-    public function beforeDelete() {
-        parent::beforeDelete();
-        $ada = GlHeader::find()->where('periode_id = :did', [':did' => $this->id])->exists();
-        if ($ada) {
-            $this->addError('id', $this->name . 'telah digunakan dalam journal');
-            return false;
-        } else {
-            if ($this->status == self::STATUS_CLOSE) {
-                $this->addError('id', $this->name . ' telah close, tidak dapat dihapus');
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public function behaviors() {
-        return [
-            [
-                'class' => 'mdm\converter\DateConverter',
-                'type' => 'date', // 'date', 'time', 'datetime'
-                'logicalFormat' => 'php:d-m-Y',
-                'attributes' => [
-                    'DateFrom' => 'date_from',
-                    'DateTo' => 'date_to',
-                ]
-            ],
-            ['class' => TimestampBehavior::className()],
-            ['class' => BlameableBehavior::className()]
-        ];
-    }
-
-    protected function closePeriode($param) {
-        sleep(1);
-        return true;
-    }
-
-    protected function cancelClosing($param) {
-        sleep(1);
-        return true;
-    }
-
 }

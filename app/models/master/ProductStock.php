@@ -3,11 +3,9 @@
 namespace app\models\master;
 
 use Yii;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "product_stock".
+ * This is the model class for table "{{%product_stock}}".
  *
  * @property integer $warehouse_id
  * @property integer $product_id
@@ -20,14 +18,14 @@ use yii\behaviors\TimestampBehavior;
  * @property Product $product
  * @property Warehouse $warehouse
  */
-class ProductStock extends \yii\db\ActiveRecord
+class ProductStock extends \app\classes\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'product_stock';
+        return '{{%product_stock}}';
     }
 
     /**
@@ -37,7 +35,7 @@ class ProductStock extends \yii\db\ActiveRecord
     {
         return [
             [['warehouse_id', 'product_id', 'qty'], 'required'],
-            [['warehouse_id', 'product_id', 'qty', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
+            [['warehouse_id', 'product_id', 'qty'], 'integer'],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
             [['warehouse_id'], 'exist', 'skipOnError' => true, 'targetClass' => Warehouse::className(), 'targetAttribute' => ['warehouse_id' => 'id']],
         ];
@@ -75,10 +73,14 @@ class ProductStock extends \yii\db\ActiveRecord
         return $this->hasOne(Warehouse::className(), ['id' => 'warehouse_id']);
     }
 
-    public function behaviors() {
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
         return [
-            ['class' => TimestampBehavior::className()],
-            ['class' => BlameableBehavior::className()]
+            'yii\behaviors\TimestampBehavior',
+            'yii\behaviors\BlameableBehavior',
         ];
     }
 }

@@ -7,15 +7,15 @@ use Yii;
 /**
  * This is the model class for table "{{%stock_adjustment_dtl}}".
  *
+ * @property integer $id
  * @property integer $adjustment_id
- * @property integer $product_id
- * @property integer $uom_id
+ * @property integer $item_id
  * @property double $qty
- * @property double $item_value
+ * @property double $value
  *
  * @property StockAdjustment $adjustment
  */
-class StockAdjustmentDtl extends \yii\db\ActiveRecord
+class StockAdjustmentDtl extends \app\classes\ActiveRecord
 {
     /**
      * @inheritdoc
@@ -31,9 +31,9 @@ class StockAdjustmentDtl extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['adjustment_id', 'product_id', 'uom_id', 'qty', 'item_value'], 'required'],
-            [['adjustment_id', 'product_id', 'uom_id'], 'integer'],
-            [['qty', 'item_value'], 'number'],
+            [['adjustment_id', 'item_id', 'qty', 'value'], 'required'],
+            [['adjustment_id', 'item_id'], 'integer'],
+            [['qty', 'value'], 'number'],
             [['adjustment_id'], 'exist', 'skipOnError' => true, 'targetClass' => StockAdjustment::className(), 'targetAttribute' => ['adjustment_id' => 'id']],
         ];
     }
@@ -44,11 +44,11 @@ class StockAdjustmentDtl extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'adjustment_id' => 'Adjustment ID',
-            'product_id' => 'Product ID',
-            'uom_id' => 'Uom ID',
+            'item_id' => 'Item ID',
             'qty' => 'Qty',
-            'item_value' => 'Item Value',
+            'value' => 'Value',
         ];
     }
 

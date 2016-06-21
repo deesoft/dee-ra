@@ -5,6 +5,8 @@ namespace app\commands;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\Console;
+use yii\helpers\ArrayHelper;
+use yii\db\Query;
 
 /**
  * Description of SampleDataController
@@ -29,7 +31,8 @@ class SampleDataController extends Controller
         }
 
         $command = Yii::$app->db->createCommand();
-        $sampleDir = __DIR__ . '/samples/a4sport';
+        $schema = Yii::$app->db->schema;
+        $sampleDir = __DIR__ . '/samples';
 
         // TRUNCATE TABLE
         $command->delete('{{%product_stock}}')->execute();
@@ -47,68 +50,85 @@ class SampleDataController extends Controller
         $command->delete('{{%warehouse}}')->execute();
         $command->delete('{{%branch}}')->execute();
         $command->delete('{{%orgn}}')->execute();
+        $command->resetSequence('{{%warehouse}}')->execute();
+        $command->resetSequence('{{%branch}}')->execute();
 
         $command->delete('{{%vendor}}')->execute();
+        $command->resetSequence('{{%vendor}}')->execute();
 
-        $command->delete('{{%product_uom}}')->execute();
+        $command->delete('{{%product_detail}}')->execute();
+        $command->resetSequence('{{%product_detail}}')->execute();
+
         $command->delete('{{%cogs}}')->execute();
         $command->delete('{{%price}}')->execute();
         $command->delete('{{%price_category}}')->execute();
-        $command->delete('{{%product_child}}')->execute();
+        $command->delete('{{%product_code}}')->execute();
         $command->delete('{{%product}}')->execute();
         $command->delete('{{%product_group}}')->execute();
         $command->delete('{{%category}}')->execute();
 
-        $command->delete('{{%uom}}')->execute();
-
         $command->delete('{{%entri_sheet}}')->execute();
         $command->delete('{{%coa}}')->execute();
+        $command->resetSequence('{{%coa}}')->execute();
         $command->delete('{{%payment_method}}')->execute();
 
-        // orgn
-        $rows = require $sampleDir . '/orgn.php';
-        $total = count($rows);
-        echo "\ninsert table {{%orgn}}\n";
-        Console::startProgress(0, $total);
-        foreach ($rows as $i => $row) {
-            $command->insert('{{%orgn}}', $this->toAssoc($row, ['id', 'code', 'name']))->execute();
-            Console::updateProgress($i + 1, $total);
-        }
+        // orgn & branch & whs
+        $command->insert('{{%orgn}}', [
+            'id' => 1,
+            'code' => '101.0001',
+            'name' => 'Dee Corp.',
+            'created_at' => time(),
+            'created_by' => 1
+        ])->execute();
         $command->resetSequence('{{%orgn}}')->execute();
-        Console::endProgress();
-
-        // branch
         $rows = require $sampleDir . '/branch.php';
         $total = count($rows);
-        echo "\ninsert table {{%branch}}\n";
+        echo "\ninsert table {{%branch}} and {{%warehouse}}\n";
         Console::startProgress(0, $total);
         foreach ($rows as $i => $row) {
-            $command->insert('{{%branch}}', $this->toAssoc($row, ['id', 'orgn_id', 'code', 'name']))->execute();
+            $whs = $row['whs'];
+            $row = [
+                'orgn_id' => 1,
+                'code' => sprintf('102.001.%04d', $i + 1),
+                'name' => $row[0],
+                'created_at' => time(),
+                'created_by' => 1,
+            ];
+            $pks = $schema->insert('{{%branch}}', $row);
+            foreach ($whs as $j => $row) {
+                $row = [
+                    'branch_id' => $pks['id'],
+                    'code' => sprintf('103.%03d.%04d', $pks['id'], $j + 1),
+                    'type' => $row[0],
+                    'name' => $row[1],
+                    'created_at' => time(),
+                    'created_by' => 1,
+                ];
+                $command->insert('{{%warehouse}}', $row)->execute();
+            }
             Console::updateProgress($i + 1, $total);
         }
-        $command->resetSequence('{{%branch}}')->execute();
-        Console::endProgress();
 
-        // warehouse
-        $rows = require $sampleDir . '/warehouse.php';
-        $total = count($rows);
-        echo "\ninsert table {{%warehouse}}\n";
-        Console::startProgress(0, $total);
-        foreach ($rows as $i => $row) {
-            $command->insert('{{%warehouse}}', $this->toAssoc($row, ['id', 'code', 'name']))->execute();
-            Console::updateProgress($i + 1, $total);
-        }
+        $command->resetSequence('{{%branch}}')->execute();
         $command->resetSequence('{{%warehouse}}')->execute();
         Console::endProgress();
 
-        // customer
+        // vendor
         $rows = require $sampleDir . '/vendor.php';
         $total = count($rows);
         echo "\ninsert table {{%vendor}}\n";
         Console::startProgress(0, $total);
+        $nums = [];
         foreach ($rows as $i => $row) {
-            $command->insert('{{%vendor}}', $this->toAssoc($row, ['id', 'type', 'code', 'name', 'contact_name',
-                    'contact_number', 'status']))->execute();
+            $row = $this->toAssoc($row, ['id', 'type', 'name', 'contact_name', 'contact_number']);
+            if (isset($nums[$row['type']])) {
+                $nums[$row['type']] ++;
+            } else {
+                $nums[$row['type']] = 1;
+            }
+            $row['code'] = sprintf('%3d.%06d.%s', 110 + $row['type'], $nums[$row['type']], $this->toCode($row['name']));
+            $row['status'] = 10;
+            $command->insert('{{%vendor}}', $row)->execute();
             Console::updateProgress($i + 1, $total);
         }
         $command->resetSequence('{{%vendor}}')->execute();
@@ -120,7 +140,9 @@ class SampleDataController extends Controller
         echo "\ninsert table {{%category}}\n";
         Console::startProgress(0, $total);
         foreach ($rows as $i => $row) {
-            $command->insert('{{%category}}', $this->toAssoc($row, ['id', 'code', 'name']))->execute();
+            $row = $this->toAssoc($row, ['id', 'name']);
+            $row['code'] = sprintf('131.%04d', $row['id']);
+            $command->insert('{{%category}}', $row)->execute();
             Console::updateProgress($i + 1, $total);
         }
         $command->resetSequence('{{%category}}')->execute();
@@ -132,7 +154,9 @@ class SampleDataController extends Controller
         echo "\ninsert table {{%product_group}}\n";
         Console::startProgress(0, $total);
         foreach ($rows as $i => $row) {
-            $command->insert('{{%product_group}}', $this->toAssoc($row, ['id', 'code', 'name']))->execute();
+            $row = $this->toAssoc($row, ['id', 'name']);
+            $row['code'] = sprintf('132.%04d', $row['id']);
+            $command->insert('{{%product_group}}', $row)->execute();
             Console::updateProgress($i + 1, $total);
         }
         $command->resetSequence('{{%product_group}}')->execute();
@@ -145,8 +169,10 @@ class SampleDataController extends Controller
         Console::startProgress(0, $total);
         $pc_ids = [];
         foreach ($rows as $i => $row) {
-            $pc_ids[] = $row[0];
-            $command->insert('{{%price_category}}', $this->toAssoc($row, ['id', 'name']))->execute();
+            $row = $this->toAssoc($row, ['id', 'name']);
+            $pc_ids[] = $row['id'];
+            $row['code'] = sprintf('133.%04d', $row['id']);
+            $command->insert('{{%price_category}}', $row)->execute();
             Console::updateProgress($i + 1, $total);
         }
         $command->resetSequence('{{%price_category}}')->execute();
@@ -157,107 +183,52 @@ class SampleDataController extends Controller
         $total = count($rows);
         echo "\ninsert table {{%product}}\n";
         Console::startProgress(0, $total);
+        $pdtl = 1;
         foreach ($rows as $i => $row) {
-            $row = $this->toAssoc($row, ['id', 'group_id', 'category_id', 'code', 'name', 'status', 'stockable']);
+            $id = $row[0];
+            $row = $this->toAssoc($row, ['id', 'group_id', 'category_id', 'code', 'name', 'status']);
+            $row['code'] = sprintf('141.%04d', $id);
             $command->insert('{{%product}}', $row)->execute();
-
-            // barcode
-            /*
-             * Skip for test
-              $batch = [];
-              for ($j = 0; $j < 3; $j++) {
-              $rand = mt_rand(1000000, 9999999) . mt_rand(100000, 999999);
-              $batch[] = [$rand, $row['id']];
-              }
-              try {
-              $command->batchInsert('{{%product_child}}', ['barcode', 'product_id'], $batch)->execute();
-              } catch (Exception $exc) {
-              echo 'Error: ' . $exc->getMessage() . "\n";
-              }
-             *
-             */
-
-            // price
-            /*
-             * Skip for test
-              $batch = [];
-              $price = mt_rand(95, 150) * 1000;
-              foreach ($pc_ids as $pc_id) {
-              $batch[] = [$row['id'], $pc_id, $price - $pc_id * 3000];
-              }
-              $command->batchInsert('{{%price}}', ['product_id', 'price_category_id', 'price'], $batch)->execute();
-             */
-
-            // cogs
-            /*
-             * Skip for test
-              $command->insert('{{%cogs}}', [
-              'product_id' => $row['id'],
-              'cogs' => $price * 0.65,
-              'last_purchase_price' => $price - 20000,
-              'created_at' => time(),
-              'created_by' => 1,
-              ])->execute();
-             *
-             */
+            $batch = [
+                [$pdtl, $id, sprintf('142.%04d.01', $id), $row['name'], 'Pcs', 1],
+                [$pdtl + 1, $id, sprintf('142.%04d.02', $id), $row['name'] . '(Dzn)', 'Dzn', 12],
+            ];
+            $command->batchInsert('{{%product_detail}}', ['id', 'product_id', 'code', 'name', 'uom', 'isi'], $batch)->execute();
+            $price = mt_rand(95, 150) * 1000;
+            $batch = [];
+            foreach ($pc_ids as $pc_id) {
+                $batch[] = [$pdtl, $pc_id, $price - $pc_id * 3000];
+                $batch[] = [$pdtl + 1, $pc_id, ($price - $pc_id * 3000) * 11];
+            }
+            $command->batchInsert('{{%price}}', ['item_id', 'category_id', 'price'], $batch)->execute();
+            $command->insert('{{%cogs}}', [
+                'product_id' => $row['id'],
+                'cogs' => $price * 0.65,
+                'last_purchase_price' => $price - 20000,
+                'created_at' => time(),
+                'created_by' => 1,
+            ])->execute();
+            $pdtl += 2;
             Console::updateProgress($i + 1, $total);
         }
         $command->resetSequence('{{%product}}')->execute();
+        $command->resetSequence('{{%product_detail}}')->execute();
         Console::endProgress();
-
-        // price
-        $rows = require $sampleDir . '/price.php';
-        $total = count($rows);
-        echo "\ninsert table {{%price}}\n";
-        Console::startProgress(0, $total);
-        foreach ($rows as $i => $row) {
-            $pc_ids[] = $row[0];
-            $command->insert('{{%price}}', $this->toAssoc($row, ['product_id', 'price_category_id', 'price']))->execute();
-            Console::updateProgress($i + 1, $total);
-        }
-        Console::endProgress();
-
-        // cogs
-        $rows = require $sampleDir . '/cogs.php';
-        $total = count($rows);
-        echo "\ninsert table {{%cogs}}\n";
-        Console::startProgress(0, $total);
-        foreach ($rows as $i => $row) {
-            $pc_ids[] = $row[0];
-            $command->insert('{{%cogs}}', $this->toAssoc($row, ['product_id', 'cogs', 'last_purchase_price']))->execute();
-            Console::updateProgress($i + 1, $total);
-        }
-        Console::endProgress();
-
-        // uom
-        $rows = require $sampleDir . '/uom.php';
-        $total = count($rows);
-        echo "\ninsert table {{%uom}}\n";
-        Console::startProgress(0, $total);
-        foreach ($rows as $i => $row) {
-            $command->insert('{{%uom}}', $this->toAssoc($row, ['id', 'code', 'name']))->execute();
-
-            // product uom
-            $sql = "insert into {{%product_uom}}([[product_id]],[[uom_id]],[[isi]])\n"
-                . "select [[id]],{$row[0]},{$row[3]} from {{%product}}";
-            $command->setSql($sql)->execute();
-            Console::updateProgress($i + 1, $total);
-        }
-        $command->resetSequence('{{%uom}}')->execute();
-        Console::endProgress();
-
         // coa
         $rows = require $sampleDir . '/coa.php';
         $total = count($rows);
         echo "\ninsert table {{%coa}}\n";
         Console::startProgress(0, $total);
         foreach ($rows as $i => $row) {
-            $command->insert('{{%coa}}', $this->toAssoc($row, ['id', 'parent_id', 'code',
-                    'name', 'type', 'normal_balance']))->execute();
+            $this->insertCoa($schema, $row);
             Console::updateProgress($i + 1, $total);
         }
-        $command->resetSequence('{{%coa}}')->execute();
         Console::endProgress();
+
+        $coa_map = ArrayHelper::map((new Query())
+                    ->select(['id', 'number'])
+                    ->from('{{%coa}}')
+                    ->all(), 'number', 'id');
 
         // entrisheet
         $rows = require $sampleDir . '/entri_sheet.php';
@@ -265,7 +236,11 @@ class SampleDataController extends Controller
         echo "\ninsert table {{%entri_sheet}}\n";
         Console::startProgress(0, $total);
         foreach ($rows as $i => $row) {
-            $command->insert('{{%entri_sheet}}', $this->toAssoc($row, ['id', 'code', 'name', 'd_coa_id', 'k_coa_id']))->execute();
+            $row = $this->toAssoc($row, ['id', 'code', 'name', 'd_coa_id', 'k_coa_id']);
+            $row['code'] = '172.' . $row['code'];
+            $row['d_coa_id'] = $coa_map[$row['d_coa_id']];
+            $row['k_coa_id'] = $coa_map[$row['k_coa_id']];
+            $command->insert('{{%entri_sheet}}', $row)->execute();
             Console::updateProgress($i + 1, $total);
         }
         $command->resetSequence('{{%entri_sheet}}')->execute();
@@ -273,15 +248,23 @@ class SampleDataController extends Controller
 
         // payment method
         $rows = require $sampleDir . '/payment_method.php';
-        $total = count($rows);
+        $ids = (new Query())->select('id')->from('{{%branch}}')->column();
+        $total = count($rows) * count($ids);
         echo "\ninsert table {{%payment_method}}\n";
         Console::startProgress(0, $total);
-        foreach ($rows as $i => $row) {
-            $command->insert('{{%payment_method}}', $this->toAssoc($row, ['id', 'branch_id',
-                    'method', 'coa_id','potongan','coa_id_potongan']))->execute();
-            Console::updateProgress($i + 1, $total);
+        $i = 1;
+        foreach ($rows as $row) {
+            $row = $this->toAssoc($row, ['method', 'coa_id', 'potongan', 'potongan_coa_id']);
+            $row['coa_id'] = $coa_map[$row['coa_id']];
+            if (isset($row['potongan_coa_id'])) {
+                $row['potongan_coa_id'] = $coa_map[$row['potongan_coa_id']];
+            }
+            foreach ($ids as $id) {
+                $row['branch_id'] = $id;
+                $command->insert('{{%payment_method}}', $row)->execute();
+                Console::updateProgress($i++, $total);
+            }
         }
-        $command->resetSequence('{{%payment_method}}')->execute();
         Console::endProgress();
     }
 
@@ -300,9 +283,44 @@ class SampleDataController extends Controller
         return $result;
     }
 
+    protected function toCode($name, $length = 6)
+    {
+        $name = strtoupper($name);
+        $s = '';
+        for ($i = 0; $i < strlen($name); $i++) {
+            if ($name[$i] >= 'A' && $name[$i] <= 'Z') {
+                $s .= $name[$i];
+            }
+        }
+        return substr($s, 0, $length);
+    }
+
+    /**
+     *
+     * @param \yii\db\Schema $schema
+     * @param type $row
+     * @param type $parent
+     */
+    protected function insertCoa($schema, $row, $parent = null)
+    {
+        if (isset($row['items'])) {
+            $items = $row['items'];
+            unset($row['items']);
+        }
+        $row = $this->toAssoc($row, ['number', 'name', 'type', 'balance']);
+        $row['code'] = '171.' . $row['number'];
+        $row['parent_id'] = $parent;
+        $primary = $schema->insert('{{%coa}}', $row);
+        if (isset($items)) {
+            foreach ($items as $item) {
+                $this->insertCoa($schema, $item, $primary['id']);
+            }
+        }
+    }
+
     public function actionStockOpname($warehouse)
     {
-        $query = (new \yii\db\Query())
+        $query = (new Query())
             ->select(['p.code', 's.qty'])
             ->from(['p' => '{{%product}}'])
             ->innerJoin(['s' => '{{%product_stock}}'], '[[p.id]]=[[s.product_id]]')

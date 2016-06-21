@@ -1,9 +1,8 @@
 <?php
 return [
-    [1, 1, 1, "2", "ss", 10],
     [2, 19, 5, "7850707955201", "Kaos Pjg On Fire", 10],
     [3, 20, 1, "7700798759892", "Cln Pjg Jeans Jnr Provider", 10],
-    [4, 21, 1, "0469361218767", "Cln Pjg Original Red Cable xxxx", 10],
+    [4, 21, 1, "0469361218767", "Cln Pjg Original Red Cable", 10],
     [5, 2, 1, "4020435981602", "Cln Pjg Jean Destroy Warning", 10],
     [6, 5, 1, "3373754888376", "Cln pjg kvs Crunchy", 10],
     [7, 6, 1, "1521764263962", "Cln Pjg Salur Diery", 10],

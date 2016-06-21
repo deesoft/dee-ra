@@ -5,7 +5,7 @@ namespace app\models\master;
 use Yii;
 
 /**
- * This is the model class for table "vendor_detail".
+ * This is the model class for table "{{%vendor_detail}}".
  *
  * @property integer $id
  * @property integer $distric_id
@@ -21,16 +21,16 @@ use Yii;
  * @property integer $updated_at
  * @property integer $updated_by
  *
- * @property Vendor $id0
+ * @property Vendor $vendor
  */
-class VendorDetail extends \yii\db\ActiveRecord
+class VendorDetail extends \app\classes\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'vendor_detail';
+        return '{{%vendor_detail}}';
     }
 
     /**
@@ -40,7 +40,7 @@ class VendorDetail extends \yii\db\ActiveRecord
     {
         return [
             [['id'], 'required'],
-            [['id', 'distric_id', 'kab_id', 'kec_id', 'kel_id', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
+            [['id', 'distric_id', 'kab_id', 'kec_id', 'kel_id'], 'integer'],
             [['latitude', 'longtitude'], 'number'],
             [['addr1', 'addr2'], 'string', 'max' => 128],
             [['id'], 'exist', 'skipOnError' => true, 'targetClass' => Vendor::className(), 'targetAttribute' => ['id' => 'id']],
@@ -72,8 +72,19 @@ class VendorDetail extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getId0()
+    public function getVendor()
     {
         return $this->hasOne(Vendor::className(), ['id' => 'id']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'yii\behaviors\TimestampBehavior',
+            'yii\behaviors\BlameableBehavior',
+        ];
     }
 }

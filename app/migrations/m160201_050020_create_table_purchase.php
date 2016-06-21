@@ -1,7 +1,5 @@
 <?php
 
-use yii\db\Schema;
-
 /**
  * 
  * @author Misbahul D Munir <misbahuldmunir@gmail.com>  
@@ -18,31 +16,31 @@ class m160201_050020_create_table_purchase extends \yii\db\Migration
         }
 
         $this->createTable('{{%purchase}}', [
-            'id' => Schema::TYPE_PK,
-            'number' => Schema::TYPE_STRING . '(16) NOT NULL',
-            'vendor_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'branch_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'date' => Schema::TYPE_DATE . ' NOT NULL',
-            'value' => Schema::TYPE_FLOAT . ' NOT NULL',
-            'discount' => Schema::TYPE_FLOAT,
-            'status' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'id' => $this->primaryKey(),
+            'type' => $this->integer()->notNull(),
+            'number' => $this->string(20)->notNull(),
+            'vendor_id' => $this->integer()->notNull(),
+            'branch_id' => $this->integer()->notNull(),
+            'date' => $this->date()->notNull(),
+            'value' => $this->float()->notNull(),
+            'discount' => $this->float(),
+            'status' => $this->integer()->notNull(),
             // history column
-            'created_at' => Schema::TYPE_INTEGER,
-            'created_by' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
-            'updated_by' => Schema::TYPE_INTEGER,
+            'created_at' => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_at' => $this->integer(),
+            'updated_by' => $this->integer(),
             ], $tableOptions);
 
         $this->createTable('{{%purchase_dtl}}', [
-            'purchase_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'product_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'uom_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'qty' => Schema::TYPE_FLOAT . ' NOT NULL',
-            'price' => Schema::TYPE_FLOAT . ' NOT NULL',
-            'discount' => Schema::TYPE_FLOAT,
-            'total_receive' => Schema::TYPE_FLOAT,
+            'id' => $this->primaryKey(),
+            'purchase_id' => $this->integer()->notNull(),
+            'item_id' => $this->integer()->notNull(),
+            'qty' => $this->float()->notNull(),
+            'price' => $this->float()->notNull(),
+            'discount' => $this->float(),
+            'extra' => $this->string(),
             // constrain
-            'PRIMARY KEY ([[purchase_id]], [[product_id]])',
             'FOREIGN KEY ([[purchase_id]]) REFERENCES {{%purchase}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);
     }

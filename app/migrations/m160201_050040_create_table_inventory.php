@@ -1,7 +1,5 @@
 <?php
 
-use yii\db\Schema;
-
 /**
  * 
  * @author Misbahul D Munir <misbahuldmunir@gmail.com>  
@@ -18,121 +16,114 @@ class m160201_050040_create_table_inventory extends \yii\db\Migration
         }
 
         $this->createTable('{{%transfer}}', [
-            'id' => Schema::TYPE_PK,
-            'number' => Schema::TYPE_STRING . '(16) NOT NULL',
-            'branch_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'branch_dest_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'date' => Schema::TYPE_DATE . ' NOT NULL',
-            'status' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'id' => $this->primaryKey(),
+            'number' => $this->string(20)->notNull(),
+            'branch_id' => $this->integer()->notNull(),
+            'branch_dest_id' => $this->integer()->notNull(),
+            'date' => $this->date()->notNull(),
+            'status' => $this->integer()->notNull(),
+            'description' => $this->string(),
             // history column
-            'created_at' => Schema::TYPE_INTEGER,
-            'created_by' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
-            'updated_by' => Schema::TYPE_INTEGER,
+            'created_at' => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_at' => $this->integer(),
+            'updated_by' => $this->integer(),
             ], $tableOptions);
 
         $this->createTable('{{%transfer_dtl}}', [
-            'transfer_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'product_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'uom_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'qty' => Schema::TYPE_FLOAT,
-            'total_release' => Schema::TYPE_FLOAT,
-            'total_receive' => Schema::TYPE_FLOAT,
+            'id' => $this->primaryKey(),
+            'transfer_id' => $this->integer()->notNull(),
+            'item_id' => $this->integer()->notNull(),
+            'qty' => $this->float(),
             // constrain
-            'PRIMARY KEY ([[transfer_id]], [[product_id]])',
             'FOREIGN KEY ([[transfer_id]]) REFERENCES {{%transfer}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);
 
         $this->createTable('{{%stock_opname}}', [
-            'id' => Schema::TYPE_PK,
-            'number' => Schema::TYPE_STRING . '(16) NOT NULL',
-            'warehouse_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'date' => Schema::TYPE_DATE . ' NOT NULL',
-            'status' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'description' => Schema::TYPE_STRING,
-            'operator' => Schema::TYPE_STRING,
+            'id' => $this->primaryKey(),
+            'number' => $this->string(20)->notNull(),
+            'warehouse_id' => $this->integer()->notNull(),
+            'date' => $this->date()->notNull(),
+            'status' => $this->integer()->notNull(),
+            'description' => $this->string(),
+            'operator' => $this->string(),
             // history column
-            'created_at' => Schema::TYPE_INTEGER,
-            'created_by' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
-            'updated_by' => Schema::TYPE_INTEGER,
+            'created_at' => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_at' => $this->integer(),
+            'updated_by' => $this->integer(),
             ], $tableOptions);
 
         $this->createTable('{{%stock_opname_dtl}}', [
-            'opname_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'product_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'uom_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'qty' => Schema::TYPE_FLOAT . ' NOT NULL',
+            'id' => $this->primaryKey(),
+            'opname_id' => $this->integer()->notNull(),
+            'item_id' => $this->integer()->notNull(),
+            'qty' => $this->float()->notNull(),
             // constrain
-            'PRIMARY KEY ([[opname_id]] , [[product_id]])',
             'FOREIGN KEY ([[opname_id]]) REFERENCES {{%stock_opname}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);
 
         $this->createTable('{{%stock_adjustment}}', [
-            'id' => Schema::TYPE_PK,
-            'number' => Schema::TYPE_STRING . '(16) NOT NULL',
-            'warehouse_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'date' => Schema::TYPE_DATE . ' NOT NULL',
-            'reff_id' => Schema::TYPE_INTEGER,
-            'description' => Schema::TYPE_STRING,
-            'status' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'id' => $this->primaryKey(),
+            'number' => $this->string(20)->notNull(),
+            'warehouse_id' => $this->integer()->notNull(),
+            'date' => $this->date()->notNull(),
+            'reff_id' => $this->integer(),
+            'description' => $this->string(),
+            'status' => $this->integer()->notNull(),
             // history column
-            'created_at' => Schema::TYPE_INTEGER,
-            'created_by' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
-            'updated_by' => Schema::TYPE_INTEGER,
+            'created_at' => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_at' => $this->integer(),
+            'updated_by' => $this->integer(),
             ], $tableOptions);
 
         $this->createTable('{{%stock_adjustment_dtl}}', [
-            'adjustment_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'product_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'uom_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'qty' => Schema::TYPE_FLOAT . ' NOT NULL',
-            'item_value' => Schema::TYPE_FLOAT . ' NOT NULL',
+            'id' => $this->primaryKey(),
+            'adjustment_id' => $this->integer()->notNull(),
+            'item_id' => $this->integer()->notNull(),
+            'qty' => $this->float()->notNull(),
+            'value' => $this->float()->notNull(),
             // constrain
-            'PRIMARY KEY ([[adjustment_id]], [[product_id]])',
             'FOREIGN KEY ([[adjustment_id]]) REFERENCES {{%stock_adjustment}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);
 
         $this->createTable('{{%goods_movement}}', [
-            'id' => Schema::TYPE_PK,
-            'number' => Schema::TYPE_STRING . '(16) NOT NULL',
-            'warehouse_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'date' => Schema::TYPE_DATE . ' NOT NULL',
-            'type' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'reff_type' => Schema::TYPE_INTEGER,
-            'reff_id' => Schema::TYPE_INTEGER,
-            'vendor_id' => Schema::TYPE_INTEGER,
-            'description' => Schema::TYPE_STRING,
-            'status' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'id' => $this->primaryKey(),
+            'number' => $this->string(20)->notNull(),
+            'type' => $this->integer()->notNull(),
+            'warehouse_id' => $this->integer()->notNull(),
+            'date' => $this->date()->notNull(),
+            'reff_type' => $this->integer(),
+            'reff_id' => $this->integer(),
+            'vendor_id' => $this->integer(),
+            'description' => $this->string(),
+            'status' => $this->integer()->notNull(),
             // history column
-            'created_at' => Schema::TYPE_INTEGER,
-            'created_by' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
-            'updated_by' => Schema::TYPE_INTEGER,
+            'created_at' => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_at' => $this->integer(),
+            'updated_by' => $this->integer(),
             ], $tableOptions);
 
         $this->createTable('{{%goods_movement_dtl}}', [
-            'movement_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'product_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'uom_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'qty' => Schema::TYPE_FLOAT . ' NOT NULL',
-            'value' => Schema::TYPE_FLOAT,
-            'cogs' => Schema::TYPE_FLOAT,
+            'id' => $this->primaryKey(),
+            'movement_id' => $this->integer()->notNull(),
+            'item_id' => $this->integer()->notNull(),
+            'qty' => $this->float()->notNull(),
+            'cogs' => $this->float()->notNull(),
+            'value' => $this->float(),
             // constrain
-            'PRIMARY KEY ([[movement_id]], [[product_id]])',
             'FOREIGN KEY ([[movement_id]]) REFERENCES {{%goods_movement}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);
 
         $this->createTable('{{%product_stock_history}}', [
-            'time' => Schema::TYPE_FLOAT,
-            'warehouse_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'product_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'qty_movement' => Schema::TYPE_FLOAT . ' NOT NULL',
-            'qty_current' => Schema::TYPE_FLOAT . ' NOT NULL',
-            'movement_id' => Schema::TYPE_INTEGER,
-            // constrain
-            'PRIMARY KEY ([[time]], [[warehouse_id]], [[product_id]])',
+            'id' => $this->primaryKey(),
+            'warehouse_id' => $this->integer()->notNull(),
+            'product_id' => $this->integer()->notNull(),
+            'qty_movement' => $this->float()->notNull(),
+            'qty' => $this->float()->notNull(),
+            'movement_id' => $this->integer(),
             ], $tableOptions);
     }
 

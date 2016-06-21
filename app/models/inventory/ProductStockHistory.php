@@ -3,31 +3,25 @@
 namespace app\models\inventory;
 
 use Yii;
-use app\models\master\Product;
-use app\models\master\Warehouse;
 
 /**
- * This is the model class for table "product_stock_history".
+ * This is the model class for table "{{%product_stock_history}}".
  *
- * @property double $time
+ * @property integer $id
  * @property integer $warehouse_id
  * @property integer $product_id
  * @property double $qty_movement
  * @property double $qty_current
  * @property integer $movement_id
  */
-class ProductStockHistory extends \yii\db\ActiveRecord
+class ProductStockHistory extends \app\classes\ActiveRecord
 {
-    public $product_code;
-    public $product_name;
-    public $goods_movement_number;
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'product_stock_history';
+        return '{{%product_stock_history}}';
     }
 
     /**
@@ -36,9 +30,9 @@ class ProductStockHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['time', 'warehouse_id', 'product_id', 'qty_movement', 'qty_current'], 'required'],
-            [['time', 'qty_movement', 'qty_current'], 'number'],
+            [['warehouse_id', 'product_id', 'qty_movement', 'qty_current'], 'required'],
             [['warehouse_id', 'product_id', 'movement_id'], 'integer'],
+            [['qty_movement', 'qty_current'], 'number'],
         ];
     }
 
@@ -48,36 +42,12 @@ class ProductStockHistory extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'time' => 'Time',
+            'id' => 'ID',
             'warehouse_id' => 'Warehouse ID',
             'product_id' => 'Product ID',
             'qty_movement' => 'Qty Movement',
             'qty_current' => 'Qty Current',
             'movement_id' => 'Movement ID',
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProduct()
-    {
-        return $this->hasOne(Product::className(), ['id' => 'product_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getWarehouse()
-    {
-        return $this->hasOne(Warehouse::className(), ['id' => 'warehouse_id']);
-    }
-
-        /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGoodsmovements()
-    {
-        return $this->hasOne(\app\models\inventory\GoodsMovement::className(), ['id' => 'movement_id']);
     }
 }

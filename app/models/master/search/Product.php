@@ -19,7 +19,8 @@ class Product extends ProductModel
     {
         return [
             [['id', 'group_id', 'category_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
-            [['code', 'name', 'edition','stockable','Edition'], 'safe'],
+            [['code', 'name'], 'safe'],
+            [['stockable'], 'boolean'],
         ];
     }
 
@@ -41,8 +42,7 @@ class Product extends ProductModel
      */
     public function search($params)
     {
-        $query = ProductModel::find();        
-        $query->with(['category','group']);
+        $query = ProductModel::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -59,6 +59,7 @@ class Product extends ProductModel
             'group_id' => $this->group_id,
             'category_id' => $this->category_id,
             'status' => $this->status,
+            'stockable' => $this->stockable,
             'created_at' => $this->created_at,
             'created_by' => $this->created_by,
             'updated_at' => $this->updated_at,

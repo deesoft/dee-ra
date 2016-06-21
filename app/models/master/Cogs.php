@@ -5,7 +5,7 @@ namespace app\models\master;
 use Yii;
 
 /**
- * This is the model class for table "cogs".
+ * This is the model class for table "{{%cogs}}".
  *
  * @property integer $product_id
  * @property double $cogs
@@ -17,16 +17,14 @@ use Yii;
  *
  * @property Product $product
  */
-class Cogs extends \yii\db\ActiveRecord
+class Cogs extends \app\classes\ActiveRecord
 {
-    public $product_code;
-    public $product_name;
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'cogs';
+        return '{{%cogs}}';
     }
 
     /**

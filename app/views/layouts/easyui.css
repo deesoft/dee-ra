@@ -1,0 +1,9 @@
+.panel-body{
+    padding: 0px;
+}
+.datagrid-cell input{
+    background-color: inherit;
+}
+span.numberbox > input.textbox-text{
+    text-align: right;
+}

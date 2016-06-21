@@ -3,23 +3,21 @@
 namespace app\models\purchase;
 
 use Yii;
-use app\models\master\Product;
-use app\models\master\Uom;
-
+use app\models\master\Item;
 /**
- * This is the model class for table "purchase_dtl".
+ * This is the model class for table "{{%purchase_dtl}}".
  *
+ * @property integer $id
  * @property integer $purchase_id
- * @property integer $product_id
- * @property integer $uom_id
+ * @property integer $item_id
  * @property double $qty
  * @property double $price
  * @property double $discount
- * @property double $total_receive
+ * @property string $extra
  *
  * @property Purchase $purchase
  */
-class PurchaseDtl extends \yii\db\ActiveRecord
+class PurchaseDtl extends \app\classes\ActiveRecord
 {
     /**
      * @inheritdoc
@@ -35,9 +33,11 @@ class PurchaseDtl extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'uom_id', 'qty', 'price'], 'required'],
-            [['purchase_id', 'product_id', 'uom_id'], 'integer'],
-            [['qty', 'price', 'discount', 'total_receive'], 'number'],
+            [['item_id', 'qty', 'price'], 'required'],
+            [['purchase_id', 'item_id'], 'integer'],
+            [['qty', 'price', 'discount'], 'number'],
+            [['extra'], 'string', 'max' => 255],
+            [['purchase_id'], 'exist', 'skipOnError' => true, 'targetClass' => Purchase::className(), 'targetAttribute' => ['purchase_id' => 'id']],
         ];
     }
 
@@ -47,13 +47,13 @@ class PurchaseDtl extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'purchase_id' => 'Purchase ID',
-            'product_id' => 'Product ID',
-            'uom_id' => 'Uom ID',
+            'item_id' => 'Item ID',
             'qty' => 'Qty',
             'price' => 'Price',
             'discount' => 'Discount',
-            'total_receive' => 'Total Receive',
+            'extra' => 'Extra',
         ];
     }
 
@@ -68,16 +68,8 @@ class PurchaseDtl extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProduct()
+    public function getItem()
     {
-        return $this->hasOne(Product::className(), ['id' => 'product_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUom()
-    {
-        return $this->hasOne(Uom::className(), ['id' => 'uom_id']);
+        return $this->hasOne(Item::className(), ['id' => 'item_id']);
     }
 }

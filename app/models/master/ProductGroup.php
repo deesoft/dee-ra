@@ -3,12 +3,9 @@
 namespace app\models\master;
 
 use Yii;
-use yii\helpers\ArrayHelper;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "product_group".
+ * This is the model class for table "{{%product_group}}".
  *
  * @property integer $id
  * @property string $code
@@ -20,31 +17,33 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property Product[] $products
  */
-class ProductGroup extends \yii\db\ActiveRecord {
-
+class ProductGroup extends \app\classes\ActiveRecord
+{
     /**
      * @inheritdoc
      */
-    public static function tableName() {
-        return 'product_group';
+    public static function tableName()
+    {
+        return '{{%product_group}}';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['code', 'name'], 'required'],
-            [['created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
-            [['code'], 'string', 'max' => 4],
-            [['name'], 'string', 'max' => 32],
+            [['code'], 'string', 'max' => 20],
+            [['name'], 'string', 'max' => 64],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'id' => 'ID',
             'code' => 'Code',
@@ -59,19 +58,19 @@ class ProductGroup extends \yii\db\ActiveRecord {
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProducts() {
+    public function getProducts()
+    {
         return $this->hasMany(Product::className(), ['group_id' => 'id']);
     }
 
-    public function behaviors() {
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
         return [
-            ['class' => TimestampBehavior::className()],
-            ['class' => BlameableBehavior::className()]
+            'yii\behaviors\TimestampBehavior',
+            'yii\behaviors\BlameableBehavior',
         ];
     }
-
-    public static function selectOptions() {
-        return ArrayHelper::map(static::find()->asArray()->all(), 'id', 'name');
-    }
-
 }

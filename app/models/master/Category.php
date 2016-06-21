@@ -3,12 +3,9 @@
 namespace app\models\master;
 
 use Yii;
-use yii\helpers\ArrayHelper;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "category".
+ * This is the model class for table "{{%category}}".
  *
  * @property integer $id
  * @property string $code
@@ -20,14 +17,14 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property Product[] $products
  */
-class Category extends \yii\db\ActiveRecord
+class Category extends \app\classes\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'category';
+        return '{{%category}}';
     }
 
     /**
@@ -37,9 +34,8 @@ class Category extends \yii\db\ActiveRecord
     {
         return [
             [['code', 'name'], 'required'],
-            [['created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
-            [['code'], 'string', 'max' => 4],
-            [['name'], 'string', 'max' => 32],
+            [['code'], 'string', 'max' => 20],
+            [['name'], 'string', 'max' => 64],
         ];
     }
 
@@ -67,15 +63,14 @@ class Category extends \yii\db\ActiveRecord
         return $this->hasMany(Product::className(), ['category_id' => 'id']);
     }
 
-    public function behaviors() {
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
         return [
-            ['class' => TimestampBehavior::className()],
-            ['class' => BlameableBehavior::className()]
+            'yii\behaviors\TimestampBehavior',
+            'yii\behaviors\BlameableBehavior',
         ];
-    }
-    
-    
-    public static function selectOptions() {
-        return ArrayHelper::map(static::find()->asArray()->all(), 'id', 'name');
     }
 }

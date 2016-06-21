@@ -3,11 +3,9 @@
 namespace app\models\master;
 
 use Yii;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "product_vendor".
+ * This is the model class for table "{{%product_vendor}}".
  *
  * @property integer $product_id
  * @property integer $vendor_id
@@ -19,22 +17,24 @@ use yii\behaviors\TimestampBehavior;
  * @property Product $product
  * @property Vendor $vendor
  */
-class ProductVendor extends \yii\db\ActiveRecord {
-
+class ProductVendor extends \app\classes\ActiveRecord
+{
     /**
      * @inheritdoc
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return '{{%product_vendor}}';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['product_id', 'vendor_id'], 'required'],
-            [['product_id', 'vendor_id', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
+            [['product_id', 'vendor_id'], 'integer'],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
             [['vendor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Vendor::className(), 'targetAttribute' => ['vendor_id' => 'id']],
         ];
@@ -43,7 +43,8 @@ class ProductVendor extends \yii\db\ActiveRecord {
     /**
      * @inheritdoc
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'product_id' => 'Product ID',
             'vendor_id' => 'Vendor ID',
@@ -57,22 +58,27 @@ class ProductVendor extends \yii\db\ActiveRecord {
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProduct() {
+    public function getProduct()
+    {
         return $this->hasOne(Product::className(), ['id' => 'product_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getVendor() {
+    public function getVendor()
+    {
         return $this->hasOne(Vendor::className(), ['id' => 'vendor_id']);
     }
 
-    public function behaviors() {
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
         return [
-            ['class' => TimestampBehavior::className()],
-            ['class' => BlameableBehavior::className()]
+            'yii\behaviors\TimestampBehavior',
+            'yii\behaviors\BlameableBehavior',
         ];
     }
-
 }

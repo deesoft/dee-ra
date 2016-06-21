@@ -1,40 +1,44 @@
 <?php
 
-use yii\web\View;
-use classes\jeasyui\DataGrid;
-use classes\jeasyui\Dialog;
+use yii\helpers\Html;
+use yii\grid\GridView;
 
-//use yii\helpers\Html;
+/* @var $this yii\web\View */
+/* @var $searchModel app\models\master\search\Product */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
-/* @var $this View */
-$this->title = 'Product';
-
-$this->registerJs($this->render('_script.js'));
+$this->title = 'Products';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<?=
-DataGrid::widget([
-    'id' => 'dg',
-    'columns' => [
-        ['field' => 'code', 'title' => 'Code', 'sortable' => true],
-        ['field' => 'name', 'title' => 'Name', 'sortable' => true],
-        ['field' => 'category.name', 'title' => 'Category', 'sortable' => true],
-        'nmStatus'
-    ],
-    'clientOptions' => [
-        'url' => ['data'],
-        'fit' => true,
-        'pagination' => true,
-        //'multiSort' => true,
-        'rownumbers' => true,
-        'pageSize' => 20,
-        'toolbar' => '#dg-toolbar',
-        'mode'=>'remote'
-    ]
-])
-?>
-<div id="dg-toolbar">
-    <a id="btn-create" class="easyui-linkbutton" flat="true">Create</a>
-    <input id="srch">
-    <input id="vbox" class="easyui-textbox">
-    <a id="btn-vbox" class="easyui-linkbutton">Klik</a>
+<div class="product-index">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?= Html::a('Create Product', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'id',
+            'code',
+            'group_id',
+            'category_id',
+            'name',
+            // 'status',
+            // 'stockable:boolean',
+            // 'created_at',
+            // 'created_by',
+            // 'updated_at',
+            // 'updated_by',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
 </div>

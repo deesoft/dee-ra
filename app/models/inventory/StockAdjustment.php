@@ -21,7 +21,7 @@ use Yii;
  *
  * @property StockAdjustmentDtl[] $stockAdjustmentDtls
  */
-class StockAdjustment extends \yii\db\ActiveRecord
+class StockAdjustment extends \app\classes\ActiveRecord
 {
     /**
      * @inheritdoc
@@ -40,7 +40,7 @@ class StockAdjustment extends \yii\db\ActiveRecord
             [['number', 'warehouse_id', 'date', 'status'], 'required'],
             [['warehouse_id', 'reff_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
             [['date'], 'safe'],
-            [['number'], 'string', 'max' => 16],
+            [['number'], 'string', 'max' => 20],
             [['description'], 'string', 'max' => 255],
         ];
     }

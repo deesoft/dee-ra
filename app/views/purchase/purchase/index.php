@@ -1,21 +1,50 @@
 <?php
 
-use yii\web\View;
-use classes\jeasyui\DataGrid;
+use yii\helpers\Html;
+use yii\grid\GridView;
 
-//use yii\helpers\Html;
+/* @var $this yii\web\View */
+/* @var $searchModel app\models\purchase\search\Purchase */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
-/* @var $this View */
+$this->title = 'Purchases';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<?= DataGrid::widget([
-    'id'=>'dg',
-    'columns'=>[
-        'number',
-        'date',
-        'vendor'
-    ],
-    'clientOptions'=>[
-        'url'=>['data'],
-        'fit'=>true,
-    ]
-]) ?>
+<div class="purchase-index">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?= Html::a('Create Purchase', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'number',
+            [
+                'attribute'=>'vendor_id',
+                'value'=>'vendor.name'
+            ],
+            [
+                'attribute'=>'branch_id',
+                'value'=>'branch.name'
+            ],
+            'date:date',
+            'value',
+            // 'discount',
+            // 'status',
+            // 'created_at',
+            // 'created_by',
+            // 'updated_at',
+            // 'updated_by',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+</div>

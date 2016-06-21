@@ -33,6 +33,14 @@ return [
         'session' => [
             'class' => 'yii\web\DbSession'
         ],
+        'response' => [
+            'formatters' => [
+                'js' => [
+                    'class' => 'yii\web\HtmlResponseFormatter',
+                    'contentType' => 'text/javascript'
+                ]
+            ]
+        ]
     ],
     'params' => $params,
 ];

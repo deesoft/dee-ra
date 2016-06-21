@@ -1,6 +1,5 @@
 <?php
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m130524_201442_init extends Migration
@@ -15,23 +14,21 @@ class m130524_201442_init extends Migration
         }
 
         $this->createTable('{{%user}}', [
-            'id' => Schema::TYPE_PK,
-            'username' => Schema::TYPE_STRING . '(32) NOT NULL',
-            'auth_key' => Schema::TYPE_STRING . '(32) NOT NULL',
-            'password_hash' => Schema::TYPE_STRING . ' NOT NULL',
-            'password_reset_token' => Schema::TYPE_STRING,
-            'email' => Schema::TYPE_STRING . ' NOT NULL',
-
-            'status' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10',
-            'created_at' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'updated_at' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'id' => $this->primaryKey(),
+            'username' => $this->string(32)->notNull(),
+            'auth_key' => $this->string(32)->notNull(),
+            'password_hash' => $this->string()->notNull(),
+            'password_reset_token' => $this->string(),
+            'email' => $this->string()->notNull(),
+            'status' => $this->smallInteger()->notNull()->defaultValue(10),
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
             ], $tableOptions);
 
         $this->createTable('{{%user_profile}}', [
-            'id' => Schema::TYPE_INTEGER,
-            'fullname' => Schema::TYPE_STRING . ' NOT NULL',
-            'photo_id'=> Schema::TYPE_INTEGER,
-
+            'id' => $this->integer(),
+            'fullname' => $this->string()->notNull(),
+            'photo_id' => $this->integer(),
             'PRIMARY KEY ([[id]])',
             'FOREIGN KEY ([[id]]) REFERENCES {{%user}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);

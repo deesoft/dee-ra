@@ -5,8 +5,9 @@ namespace app\models\accounting;
 use Yii;
 
 /**
- * This is the model class for table "payment_dtl".
+ * This is the model class for table "{{%payment_dtl}}".
  *
+ * @property integer $id
  * @property integer $payment_id
  * @property integer $invoice_id
  * @property double $value
@@ -14,7 +15,7 @@ use Yii;
  * @property Invoice $invoice
  * @property Payment $payment
  */
-class PaymentDtl extends \yii\db\ActiveRecord
+class PaymentDtl extends \app\classes\ActiveRecord
 {
     /**
      * @inheritdoc
@@ -30,10 +31,11 @@ class PaymentDtl extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['invoice_id', 'value'], 'required'],
+            [['payment_id', 'invoice_id', 'value'], 'required'],
             [['payment_id', 'invoice_id'], 'integer'],
             [['value'], 'number'],
             [['invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => Invoice::className(), 'targetAttribute' => ['invoice_id' => 'id']],
+            [['payment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_id' => 'id']],
         ];
     }
 
@@ -43,6 +45,7 @@ class PaymentDtl extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'payment_id' => 'Payment ID',
             'invoice_id' => 'Invoice ID',
             'value' => 'Value',

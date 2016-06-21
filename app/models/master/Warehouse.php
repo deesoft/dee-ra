@@ -3,14 +3,12 @@
 namespace app\models\master;
 
 use Yii;
-use yii\helpers\ArrayHelper;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "warehouse".
+ * This is the model class for table "{{%warehouse}}".
  *
  * @property integer $id
+ * @property integer $branch_id
  * @property string $code
  * @property string $name
  * @property integer $created_at
@@ -20,16 +18,16 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property ProductStock[] $productStocks
  * @property Product[] $products
+ * @property Branch $branch
  */
-class Warehouse extends \yii\db\ActiveRecord
+class Warehouse extends \app\classes\ActiveRecord
 {
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'warehouse';
+        return '{{%warehouse}}';
     }
 
     /**
@@ -38,11 +36,11 @@ class Warehouse extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['code', 'name'], 'required'],
-            [['created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
-            [['code'], 'string', 'max' => 4],
-            [['name'], 'string', 'max' => 32],
-            //[['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
+            [['branch_id', 'code', 'name'], 'required'],
+            [['branch_id'], 'integer'],
+            [['code'], 'string', 'max' => 20],
+            [['name'], 'string', 'max' => 64],
+            [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
         ];
     }
 
@@ -53,6 +51,7 @@ class Warehouse extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'branch_id' => 'Branch ID',
             'code' => 'Code',
             'name' => 'Name',
             'created_at' => 'Created At',
@@ -73,21 +72,19 @@ class Warehouse extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProducts()
+    public function getBranch()
     {
-        return $this->hasMany(Product::className(), ['id' => 'product_id'])->viaTable('product_stock', ['warehouse_id' => 'id']);
+        return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
     }
 
-    public static function selectOptions()
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
     {
-        return ArrayHelper::map(static::find()->asArray()->all(), 'id', 'name');
-    }
-
-    public function behaviors() {
         return [
-            ['class' => TimestampBehavior::className()],
-            ['class' => BlameableBehavior::className()]
+            'yii\behaviors\TimestampBehavior',
+            'yii\behaviors\BlameableBehavior',
         ];
     }
-
 }

@@ -5,7 +5,7 @@ namespace app\models\accounting;
 use Yii;
 
 /**
- * This is the model class for table "gl_detail".
+ * This is the model class for table "{{%gl_detail}}".
  *
  * @property integer $id
  * @property integer $header_id
@@ -15,15 +15,14 @@ use Yii;
  * @property Coa $coa
  * @property GlHeader $header
  */
-class GlDetail extends \yii\db\ActiveRecord
+class GlDetail extends \app\classes\ActiveRecord
 {
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'gl_detail';
+        return '{{%gl_detail}}';
     }
 
     /**
@@ -32,10 +31,11 @@ class GlDetail extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['coa_id', 'amount'], 'required'],
+            [['header_id', 'coa_id', 'amount'], 'required'],
             [['header_id', 'coa_id'], 'integer'],
-            [['amount', 'debit', 'credit'], 'number'],
+            [['amount'], 'number'],
             [['coa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Coa::className(), 'targetAttribute' => ['coa_id' => 'id']],
+            [['header_id'], 'exist', 'skipOnError' => true, 'targetClass' => GlHeader::className(), 'targetAttribute' => ['header_id' => 'id']],
         ];
     }
 
@@ -58,30 +58,6 @@ class GlDetail extends \yii\db\ActiveRecord
     public function getCoa()
     {
         return $this->hasOne(Coa::className(), ['id' => 'coa_id']);
-    }
-
-    public function setDebit($value)
-    {
-        if ($value > 0) {
-            $this->amount = $value;
-        }
-    }
-
-    public function getDebit()
-    {
-        return ($this->amount >= 0) ? $this->amount : null;
-    }
-
-    public function setCredit($value)
-    {
-        if ($value > 0) {
-            $this->amount = -1 * $value;
-        }
-    }
-
-    public function getCredit()
-    {
-        return ($this->amount < 0) ? -1 * $this->amount : null;
     }
 
     /**

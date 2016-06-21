@@ -3,102 +3,69 @@
 namespace app\models\sales;
 
 use Yii;
-use app\models\master\Product;
-use app\models\master\Uom;
-use app\models\master\Cogs;
-use app\models\master\ProductUom;
 
 /**
- * This is the model class for table "sales_dtl".
+ * This is the model class for table "{{%sales_dtl}}".
  *
+ * @property integer $id
  * @property integer $sales_id
- * @property integer $product_id
- * @property integer $uom_id
+ * @property integer $item_id
  * @property double $qty
  * @property double $price
  * @property double $cogs
  * @property double $discount
- * @property double $total_release
+ * @property double $tax
+ * @property string $extra
  *
  * @property Sales $sales
- * @property Product $product
  */
-class SalesDtl extends \yii\db\ActiveRecord {
-
-    public $total_release;
-    
+class SalesDtl extends \app\classes\ActiveRecord
+{
     /**
      * @inheritdoc
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return '{{%sales_dtl}}';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
-            [['product_id', 'uom_id', 'qty', 'price'], 'required'],
-            [['sales_id', 'product_id', 'uom_id'], 'integer'],
-            [['cogs'], 'default', 'value' => function() {
-            $cogs = Cogs::findOne($this->product_id);
-            return $cogs ? $cogs->cogs : null;
-        }],
-            [['cogs'], 'required'],
-            [['qty', 'price', 'cogs', 'discount', 'total_release'], 'number'],
+            [['sales_id', 'item_id', 'qty', 'price', 'cogs'], 'required'],
+            [['sales_id', 'item_id'], 'integer'],
+            [['qty', 'price', 'cogs', 'discount', 'tax'], 'number'],
+            [['extra'], 'string', 'max' => 255],
+            [['sales_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sales::className(), 'targetAttribute' => ['sales_id' => 'id']],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
+            'id' => 'ID',
             'sales_id' => 'Sales ID',
-            'product_id' => 'Product ID',
-            'uom_id' => 'Uom ID',
+            'item_id' => 'Item ID',
             'qty' => 'Qty',
             'price' => 'Price',
+            'cogs' => 'Cogs',
             'discount' => 'Discount',
-            'total_release' => 'Total Release',
+            'tax' => 'Tax',
+            'extra' => 'Extra',
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSales() {
-        return $this->hasOne(Sales::className(), ['id' => 'sales_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProduct() {
-        return $this->hasOne(Product::className(), ['id' => 'product_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUom() {
-        return $this->hasOne(Uom::className(), ['id' => 'uom_id']);
-    }
-
-    /**
-     * @return Double
-     */
-    public function getTotalLine() {
-        $post_discount = (1-($this->discount/100));
-        return ($this->qty * $this->price) * $post_discount;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProductUom()
+    public function getSales()
     {
-        return $this->hasOne(ProductUom::className(), ['product_id' => 'product_id', 'uom_id' => 'uom_id']);
+        return $this->hasOne(Sales::className(), ['id' => 'sales_id']);
     }
 }

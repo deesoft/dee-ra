@@ -3,12 +3,9 @@
 namespace app\models\accounting;
 
 use Yii;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
-use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "entri_sheet".
+ * This is the model class for table "{{%entri_sheet}}".
  *
  * @property integer $id
  * @property string $code
@@ -19,17 +16,12 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_by
  * @property integer $updated_at
  * @property integer $updated_by
- * @property double $amount
  *
  * @property Coa $dCoa
  * @property Coa $kCoa
  */
-class EntriSheet extends \yii\db\ActiveRecord
+class EntriSheet extends \app\classes\ActiveRecord
 {
-    public $amount;
-    public $coa_kredit;
-    public $coa_debit;
-
     /**
      * @inheritdoc
      */
@@ -44,10 +36,12 @@ class EntriSheet extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['d_coa_id', 'k_coa_id'], 'required'],
-            [['code'], 'autonumber', 'format' => 'ES' .'?', 'digit' => 3],
-            [['name'], 'string', 'max' => 64],
-            [['coa_kredit', 'coa_debit'], 'safe'],
+            [['code', 'd_coa_id', 'k_coa_id'], 'required'],
+            [['d_coa_id', 'k_coa_id', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
+            [['code'], 'string', 'max' => 32],
+            [['name'], 'string', 'max' => 128],
+            [['d_coa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Coa::className(), 'targetAttribute' => ['d_coa_id' => 'id']],
+            [['k_coa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Coa::className(), 'targetAttribute' => ['k_coa_id' => 'id']],
         ];
     }
 
@@ -58,7 +52,10 @@ class EntriSheet extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'code' => 'Code',
             'name' => 'Name',
+            'd_coa_id' => 'D Coa ID',
+            'k_coa_id' => 'K Coa ID',
             'created_at' => 'Created At',
             'created_by' => 'Created By',
             'updated_at' => 'Updated At',
@@ -80,18 +77,5 @@ class EntriSheet extends \yii\db\ActiveRecord
     public function getKCoa()
     {
         return $this->hasOne(Coa::className(), ['id' => 'k_coa_id']);
-    }
-
-    public static function selectOptions()
-    {
-        return ArrayHelper::map(static::find()->asArray()->all(), 'id', 'name');
-    }
-
-    public function behaviors()
-    {
-        return [
-            ['class' => TimestampBehavior::className()],
-            ['class' => BlameableBehavior::className()]
-        ];
     }
 }

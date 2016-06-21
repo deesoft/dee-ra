@@ -42,8 +42,6 @@ class Branch extends BranchModel
     public function search($params)
     {
         $query = BranchModel::find();
-        
-        $query->with(['orgn']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

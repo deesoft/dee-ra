@@ -5,7 +5,7 @@ namespace app\models\master;
 use Yii;
 
 /**
- * This is the model class for table "vendor".
+ * This is the model class for table "{{%vendor}}".
  *
  * @property integer $id
  * @property integer $type
@@ -23,18 +23,8 @@ use Yii;
  * @property Product[] $products
  * @property VendorDetail $vendorDetail
  */
-class Vendor extends \yii\db\ActiveRecord
+class Vendor extends \app\classes\ActiveRecord
 {
-    use \mdm\converter\EnumTrait;
-
-    const TYPE_SUPPLIER = 10;
-    const TYPE_CUSTOMER = 20;
-    const TYPE_INTERN = 30;
-
-    const STATUS_ACTIVE = 10;
-    const STATUS_INACTIVE = 0;
-
-
     /**
      * @inheritdoc
      */
@@ -50,8 +40,8 @@ class Vendor extends \yii\db\ActiveRecord
     {
         return [
             [['type', 'code', 'name', 'status'], 'required'],
-            [['type', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
-            [['code'], 'string', 'max' => 8],
+            [['type', 'status'], 'integer'],
+            [['code'], 'string', 'max' => 20],
             [['name', 'contact_name', 'contact_number'], 'string', 'max' => 64],
         ];
     }
@@ -76,15 +66,6 @@ class Vendor extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getNmType()
-    {
-        return $this->getLogical('type', 'TYPE_');
-    }
-
-    public function getNmStatus()
-    {
-        return $this->getLogical('status', 'STATUS_');
-    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -98,7 +79,7 @@ class Vendor extends \yii\db\ActiveRecord
      */
     public function getProducts()
     {
-        return $this->hasMany(Product::className(), ['id' => 'product_id'])->viaTable('product_vendor', ['vendor_id' => 'id']);
+        return $this->hasMany(Product::className(), ['id' => 'product_id'])->viaTable('{{%product_vendor}}', ['vendor_id' => 'id']);
     }
 
     /**
@@ -107,5 +88,16 @@ class Vendor extends \yii\db\ActiveRecord
     public function getVendorDetail()
     {
         return $this->hasOne(VendorDetail::className(), ['id' => 'id']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'yii\behaviors\TimestampBehavior',
+            'yii\behaviors\BlameableBehavior',
+        ];
     }
 }

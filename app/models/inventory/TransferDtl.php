@@ -3,31 +3,25 @@
 namespace app\models\inventory;
 
 use Yii;
-use app\models\master\Product;
-use app\models\master\Uom;
 
 /**
- * This is the model class for table "transfer_dtl".
+ * This is the model class for table "{{%transfer_dtl}}".
  *
+ * @property integer $id
  * @property integer $transfer_id
- * @property integer $product_id
- * @property integer $uom_id
+ * @property integer $item_id
  * @property double $qty
- * @property double $total_release
- * @property double $total_receive
  *
  * @property Transfer $transfer
- * @property Product $product
  */
-class TransferDtl extends \yii\db\ActiveRecord
+class TransferDtl extends \app\classes\ActiveRecord
 {
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'transfer_dtl';
+        return '{{%transfer_dtl}}';
     }
 
     /**
@@ -36,9 +30,10 @@ class TransferDtl extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'uom_id'], 'required'],
-            [['transfer_id', 'product_id', 'uom_id'], 'integer'],
-            [['qty', 'total_release', 'total_receive'], 'number'],
+            [['transfer_id', 'item_id'], 'required'],
+            [['transfer_id', 'item_id'], 'integer'],
+            [['qty'], 'number'],
+            [['transfer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Transfer::className(), 'targetAttribute' => ['transfer_id' => 'id']],
         ];
     }
 
@@ -48,12 +43,10 @@ class TransferDtl extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'transfer_id' => 'Transfer ID',
-            'product_id' => 'Product ID',
-            'uom_id' => 'Uom ID',
+            'item_id' => 'Item ID',
             'qty' => 'Qty',
-            'total_release' => 'Total Release',
-            'total_receive' => 'Total Receive',
         ];
     }
 
@@ -63,21 +56,5 @@ class TransferDtl extends \yii\db\ActiveRecord
     public function getTransfer()
     {
         return $this->hasOne(Transfer::className(), ['id' => 'transfer_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProduct()
-    {
-        return $this->hasOne(Product::className(), ['id' => 'product_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUom()
-    {
-        return $this->hasOne(Uom::className(), ['id' => 'uom_id']);
     }
 }
