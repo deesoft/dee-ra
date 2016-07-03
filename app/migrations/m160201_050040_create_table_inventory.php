@@ -98,6 +98,7 @@ class m160201_050040_create_table_inventory extends \yii\db\Migration
             'reff_id' => $this->integer(),
             'vendor_id' => $this->integer(),
             'description' => $this->string(),
+            'extra_data' => $this->string(),
             'status' => $this->integer()->notNull(),
             // history column
             'created_at' => $this->integer(),
@@ -110,6 +111,7 @@ class m160201_050040_create_table_inventory extends \yii\db\Migration
             'id' => $this->primaryKey(),
             'movement_id' => $this->integer()->notNull(),
             'item_id' => $this->integer()->notNull(),
+            'reff_id' => $this->integer(),
             'qty' => $this->float()->notNull(),
             'cogs' => $this->float()->notNull(),
             'value' => $this->float(),

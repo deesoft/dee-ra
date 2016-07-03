@@ -28,20 +28,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'number',
             [
                 'attribute'=>'vendor_id',
-                'value'=>'vendor.name'
+                'value'=>'vendor.name',
+                'label'=>'Supplier',
             ],
             [
                 'attribute'=>'branch_id',
-                'value'=>'branch.name'
+                'value'=>'branch.name',
+                'label'=>'Branch',
             ],
             'date:date',
             'value',
-            // 'discount',
-            // 'status',
-            // 'created_at',
-            // 'created_by',
-            // 'updated_at',
-            // 'updated_by',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

@@ -45,7 +45,7 @@ use yii\helpers\Html;
     <?=
     TabularInput::widget([
         'id' => 'detail-grid',
-        'allModels' => $model->items->records,
+        'allModels' => $model->items,
         'model' => PurchaseDtl::className(),
         'tag' => 'tbody',
         'itemOptions' => ['tag' => 'tr'],

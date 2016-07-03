@@ -18,34 +18,34 @@
         if (change) {
             panel.find('input[field]').val('');
         }
-        var vv = values || {};
+        values = $.extend({}, values || {});
         var ss = [];
         var prefixs = ['!==', '!=', '>=', '<=', '>', '<', '==', '='];
-        $.each(vv, function (f, v) {
+        var inputType;
+        $.each(values, function (f, iv) {
             var tr = panel.find('tr[field="' + f + '"]');
             var op = tr.attr('operator');
             if (!op) {
-                op = v.op;
+                op = iv.operator;
             }
-            var nv = {};
-            if (typeof v == 'object') {
-                nv.v = v.v;
-                nv.v2 = v.v2;
+            var ov = {};
+            if (typeof iv == 'object') {
+                ov.value = iv.value;
             } else {
-                nv.v = v;
+                ov.value = iv;
             }
-            if (!op && nv.v) {
+            if (!op && ov.value) {
                 for (var i = 0; i < prefixs.length; i++) {
-                    if (nv.v.indexOf(prefixs[i]) === 0) {
+                    if (ov.value.indexOf(prefixs[i]) === 0) {
                         op = prefixs[i];
-                        nv.v = nv.v.substr(prefixs[i].length);
+                        ov.value = ov.value.substr(prefixs[i].length);
                         break;
                     }
                 }
             }
-            
+
             if (op) {
-                nv.op = op;
+                ov.operator = op;
             }
 
             var s = f;
@@ -57,41 +57,49 @@
                 s += (op || '=');
             }
 
-            if (nv.v) {
-                s += encodeURIComponent(nv.v);
-                if (change) {
-                    tr.find('input[field="v"]')[inputs[f].type]('setValue', nv.v);
-                }
-            }
+            inputType = inputs[f].type;
             if (op == '[]' || op == '![]') {
-                s += ':' + encodeURIComponent(nv.v2) + ']';
+                s += encodeURIComponent(ov.value[0]) + ':' + encodeURIComponent(ov.value[1]) + ']';
                 if (change) {
-                    tr.find('input[field="v2"]')[inputs[f].type]('setValue', nv.v2);
+                    tr.find('input[field="v1"]')[inputType]('setValue', ov.value[0]);
+                    tr.find('input[field="v2"]')[inputType]('setValue', ov.value[1]);
+                }
+            } else if (ov.value) {
+                s += encodeURIComponent(ov.value);
+                if (change) {
+                    tr.find('input[field="v1"]')[inputType]('setValue', ov.value);
                 }
             }
+
             ss.push(s);
-            vv[f] = nv;
+            values[f] = ov;
         });
-        state.value = vv;
+        state.value = values;
         $(target).combo('setText', ss.join('&'));
     }
 
     /**
      * load data, the old list items will be removed.
      */
-    function loadData(target, data) {
+    function loadData(target, searcher) {
         var state = $.data(target, 'dsearchbox');
         var opts = state.options;
-        state.data = data;
+        state.searcher = searcher || [];
 
         var panel = $(target).combo('panel');
-        render(target, panel, state.data);
+        render(target, panel, state.searcher);
 
         setValue(target, opts.value, true);
-        opts.onLoadSuccess.call(target, data);
+        opts.onLoadSuccess.call(target, searcher);
     }
 
-    function render(target, container, data) {
+    function render(target, container, searcher) {
+        var co = $(container);
+        if (searcher.length == 0) {
+            co.html('');
+            return;
+        }
+
         var state = $.data(target, 'dsearchbox');
         var opts = state.options;
 
@@ -101,8 +109,8 @@
         var inpType, inpOpts;
         var width;
         tb.push('<table style="width:100%"><tbody>');
-        for (var i = 0; i < data.length; i++) {
-            var row = data[i];
+        for (var i = 0; i < searcher.length; i++) {
+            var row = searcher[i];
             var f = row.field;
             if (!f || ff[f]) {
                 continue;
@@ -127,7 +135,7 @@
                 inpOpts = {};
             }
 
-            tr += '<input field="v" >';
+            tr += '<input field="v1" >';
             width = 200;
             if (row.op == '[]' || row.op == '![]') {
                 tr += ' <input field="v2" >';
@@ -147,7 +155,6 @@
 
         tb.push('</td></tr></tbody></table>');
 
-        var co = $(container);
         co.html(tb.join(''));
 
         $.each(inputs, function (f, inp) {
@@ -160,7 +167,7 @@
             iconCls: 'icon-search',
         }, opts.buttonSearchOptions, {
             onClick: function () {
-                doEnter(target);
+                applyValue(target);
             }
         }));
         co.find('a[action="cancel"]').linkbutton($.extend({}, {
@@ -173,30 +180,34 @@
         state.inputs = inputs;
     }
 
-    function doEnter(target) {
+    function applyValue(target) {
         var t = $(target);
         var state = $.data(target, 'dsearchbox');
         var opts = state.options;
         var panel = t.combo('panel');
         var inputs = state.inputs;
 
-        var vv = {};
+        var values = {};
         panel.find('tr[field]').each(function () {
             var tr = $(this);
             var f = tr.attr('field');
-
-            var v = {
-                op: tr.attr('operator')
-            };
-            tr.find('input[field]').each(function () {
-                v[$(this).attr('field')] = $(this)[inputs[f].type]('getValue');
-            });
-            vv[f] = v;
+            var op = tr.attr('operator');
+            var v = {operator: op};
+            var inpType = inputs[f].type;
+            if (op == '[]' || op == '![]') {
+                v.value = [
+                    tr.find('input[field="v1"]')[inpType]('getValue'),
+                    tr.find('input[field="v2"]')[inpType]('getValue')
+                ];
+            } else {
+                v.value = tr.find('input[field="v1"]')[inpType]('getValue');
+            }
+            values[f] = v;
         });
-        setValue(target, vv, false);
+        setValue(target, values, false);
 
         t.dsearchbox('hidePanel');
-        opts.onChangeValue.call(target, vv);
+        opts.onChangeValue.call(target, values);
     }
 
     /**
@@ -213,7 +224,7 @@
                 opts.onShowPanel.call(this);
             }
         }));
-        loadData(target, opts.data);
+        loadData(target, opts.searcher);
     }
 
     $.fn.dsearchbox = function (options, param) {
@@ -234,7 +245,7 @@
             } else {
                 state = $.data(this, 'dsearchbox', {
                     options: $.extend({}, $.fn.dsearchbox.defaults, $.fn.dsearchbox.parseOptions(this), options),
-                    data: [],
+                    searcher: [],
                 });
             }
             state.value = $.extend({}, state.options.value || {});
@@ -260,8 +271,8 @@
                 $(this).addClass('dsearchbox-f').attr('dsearchboxName', $(this).attr('textboxName'));
             });
         },
-        getData: function (jq) {
-            return $.data(jq[0], 'dsearchbox').data;
+        getSearcher: function (jq) {
+            return $.data(jq[0], 'dsearchbox').searcher;
         },
         setValue: function (jq, values) {
             return jq.each(function () {
@@ -279,9 +290,9 @@
                 $.data(this, 'dsearchbox').options.value = {};
             });
         },
-        loadData: function (jq, data) {
+        setSearcher: function (jq, searcher) {
             return jq.each(function () {
-                loadData(this, data);
+                loadData(this, searcher);
             });
         },
     };
@@ -292,17 +303,19 @@
     };
 
     $.fn.dsearchbox.defaults = $.extend({}, $.fn.combo.defaults, {
-        data: null,
+        searcher: null,
         value: {},
         panelWidth: 'auto',
         panelHeight: 'auto',
+        buttonSearchOptions: {},
+        buttonCancelOptions: {},
         keyHandler: {
             up: function (e) {},
             down: function (e) {},
             left: function (e) {},
             right: function (e) {},
             enter: function (e) {
-                doEnter(this)
+                applyValue(this)
             },
             query: function (q, e) {}
         },

@@ -3,6 +3,7 @@
 namespace app\models\master;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%warehouse}}".
@@ -22,6 +23,7 @@ use Yii;
  */
 class Warehouse extends \app\classes\ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
@@ -75,6 +77,15 @@ class Warehouse extends \app\classes\ActiveRecord
     public function getBranch()
     {
         return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
+    }
+
+    public static function options($branch_id = null)
+    {
+        $query = static::find()->asArray();
+        if ($branch_id !== null) {
+            $query->andWhere(['branch_id' => $branch_id]);
+        }
+        return ArrayHelper::map($query->all(), 'id', 'name');
     }
 
     /**

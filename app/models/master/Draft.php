@@ -19,6 +19,12 @@ use Yii;
  */
 class Draft extends \app\classes\ActiveRecord
 {
+    public static $type_names = [
+        211 => 'Purchase',
+    ];
+    public static $type_routes = [
+        211 => 'purchase/purchase/create'
+    ];
 
     /**
      * @inheritdoc
@@ -56,6 +62,11 @@ class Draft extends \app\classes\ActiveRecord
         $this->data = $value === null ? null : serialize($value);
     }
 
+    public function getTypeName()
+    {
+        return static::$type_names[$this->type];
+    }
+
     /**
      * @inheritdoc
      */
@@ -63,7 +74,7 @@ class Draft extends \app\classes\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'type' => 'Type',
+            'action' => 'Url',
             'data' => 'Data',
             'created_at' => 'Created At',
             'created_by' => 'Created By',

@@ -21,11 +21,12 @@ use Yii;
  * @property integer $updated_at
  * @property integer $updated_by
  *
- * @property GlDetail[] $glDetails
+ * @property GlDetail[] $items
  * @property AccPeriode $periode
  */
 class GlHeader extends \app\classes\ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
@@ -40,13 +41,20 @@ class GlHeader extends \app\classes\ActiveRecord
     public function rules()
     {
         return [
-            [['number', 'date', 'periode_id', 'branch_id', 'reff_type', 'description', 'status'], 'required'],
+            [['periode_id'], 'default', 'value' => AccPeriode::getActivePeriode()],
+            [['Date', 'periode_id', 'branch_id', 'reff_type', 'description', 'status'], 'required'],
             [['date'], 'safe'],
-            [['periode_id', 'branch_id', 'reff_type', 'reff_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
-            [['number'], 'string', 'max' => 20],
+            [['periode_id', 'branch_id', 'reff_type', 'reff_id', 'status'], 'integer'],
+            [['!number'], 'autonumber', 'format' => 'formatNumber', 'digit' => 6],
             [['description'], 'string', 'max' => 255],
             [['periode_id'], 'exist', 'skipOnError' => true, 'targetClass' => AccPeriode::className(), 'targetAttribute' => ['periode_id' => 'id']],
         ];
+    }
+
+    public function formatNumber()
+    {
+        $date = date('Ymd');
+        return "291.$date.?";
     }
 
     /**
@@ -74,9 +82,14 @@ class GlHeader extends \app\classes\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getGlDetails()
+    public function getItems()
     {
         return $this->hasMany(GlDetail::className(), ['header_id' => 'id']);
+    }
+
+    public function setItems($values)
+    {
+        $this->loadRelated('items', $values);
     }
 
     /**

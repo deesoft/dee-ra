@@ -119,6 +119,7 @@ class m160201_050050_create_table_accounting extends \yii\db\Migration
             'item' => $this->string(64)->notNull(),
             'qty' => $this->float(),
             'value' => $this->float()->notNull(),
+            'reff_id' => $this->integer(),
             // constrain
             'FOREIGN KEY ([[invoice_id]]) REFERENCES {{%invoice}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);

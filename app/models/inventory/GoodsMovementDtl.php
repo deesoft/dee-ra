@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property integer $movement_id
  * @property integer $item_id
+ * @property integer $reff_id
  * @property double $qty
  * @property double $cogs
  * @property double $value
@@ -32,8 +33,8 @@ class GoodsMovementDtl extends \app\classes\ActiveRecord
     public function rules()
     {
         return [
-            [['movement_id', 'item_id', 'qty', 'cogs'], 'required'],
-            [['movement_id', 'item_id'], 'integer'],
+            [['item_id', 'qty', 'cogs'], 'required'],
+            [['movement_id', 'item_id', 'reff_id'], 'integer'],
             [['qty', 'cogs', 'value'], 'number'],
             [['movement_id'], 'exist', 'skipOnError' => true, 'targetClass' => GoodsMovement::className(), 'targetAttribute' => ['movement_id' => 'id']],
         ];

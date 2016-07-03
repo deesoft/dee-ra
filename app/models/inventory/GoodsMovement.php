@@ -3,7 +3,7 @@
 namespace app\models\inventory;
 
 use Yii;
-use app\classes\ARCollection;
+use app\models\master\Warehouse;
 
 /**
  * This is the model class for table "{{%goods_movement}}".
@@ -17,13 +17,17 @@ use app\classes\ARCollection;
  * @property integer $reff_id
  * @property integer $vendor_id
  * @property string $description
+ * @property array $data
  * @property integer $status
  * @property integer $created_at
  * @property integer $created_by
  * @property integer $updated_at
  * @property integer $updated_by
+ * @property string $nmType
  *
- * @property GoodsMovementDtl[]|ARCollection $items
+ * @property GoodsMovementDtl[] $items
+ * @property Warehouse $warehouse
+ *
  */
 class GoodsMovement extends \app\classes\ActiveRecord
 {
@@ -44,16 +48,16 @@ class GoodsMovement extends \app\classes\ActiveRecord
         return [
             [['type', 'warehouse_id', 'Date', 'status'], 'required'],
             [['type', 'warehouse_id', 'reff_type', 'reff_id', 'vendor_id', 'status'], 'integer'],
-            [['!number'], 'autonumber', 'format' => 'autonumber', 'digit' => 6],
-            [['date'], 'safe'],
+            [['!number'], 'autonumber', 'format' => 'formatNumber', 'digit' => 6],
+            [['date', 'data'], 'safe'],
             [['description'], 'string', 'max' => 255],
         ];
     }
 
-    public function autonumber()
+    public function formatNumber()
     {
         $date = date('Ymd');
-        return "21{$this->type}.$date.?";
+        return "22{$this->type}.$date.?";
     }
 
     /**
@@ -87,8 +91,56 @@ class GoodsMovement extends \app\classes\ActiveRecord
         return $this->hasMany(GoodsMovementDtl::className(), ['movement_id' => 'id']);
     }
 
-    public function setItems($items)
+    /**
+     * @param array $values
+     */
+    public function setItems($values)
     {
-        $this->items->setRecords($items);
+        $this->loadRelated('items', $values);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWarehouse()
+    {
+        return $this->hasOne(Warehouse::className(), ['id' => 'warehouse_id']);
+    }
+
+    public function getNmType()
+    {
+        switch ($this->type) {
+            case 1:
+                return 'Receive';
+            case 2:
+                return 'Issue';
+            default:
+                break;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return[
+            [
+                'class' => 'mdm\converter\DateConverter',
+                'type' => 'date', // 'date', 'time', 'datetime'
+                'logicalFormat' => 'php:d-m-Y',
+                'attributes' => [
+                    'Date' => 'date', // date is original attribute
+                ]
+            ],
+            [
+                'class' => 'app\classes\ArrayConverter',
+                'attributes' => [
+                    'data' => 'extra_data', // date is original attribute
+                ]
+            ],
+            'yii\behaviors\BlameableBehavior',
+            'yii\behaviors\TimestampBehavior',
+        ];
     }
 }

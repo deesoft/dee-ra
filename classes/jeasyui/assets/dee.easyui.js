@@ -47,6 +47,7 @@
 
     // remote method
     $.fn.datagrid.defaults.method = $.fn.deeEasyui.defaults.method;
+    $.fn.combogrid.defaults.method = $.fn.deeEasyui.defaults.method;
     $.fn.combobox.defaults.method = $.fn.deeEasyui.defaults.method;
 
     // date format and parser

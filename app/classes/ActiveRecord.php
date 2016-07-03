@@ -11,17 +11,6 @@ use Yii;
  */
 class ActiveRecord extends \yii\db\ActiveRecord
 {
-
-    /**
-     * @inheritdoc
-     */
-//    public function formName()
-//    {
-//        return '';
-//    }
-
-    public static function find()
-    {
-        return Yii::createObject(ActiveQuery::className(), [get_called_class()]);
-    }
+    use RelationTrait;
+    
 }

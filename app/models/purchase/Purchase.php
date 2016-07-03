@@ -3,9 +3,11 @@
 namespace app\models\purchase;
 
 use Yii;
-use app\classes\ARCollection;
 use app\models\master\Vendor;
 use app\models\master\Branch;
+use app\models\inventory\GoodsMovement;
+use app\models\accounting\GlHeader;
+use yii\db\Query;
 
 /**
  * This is the model class for table "{{%purchase}}".
@@ -24,14 +26,20 @@ use app\models\master\Branch;
  * @property integer $updated_at
  * @property integer $updated_by
  *
- * @property PurchaseDtl[]|ARCollection $items
+ * @property PurchaseDtl[] $items
  * @property Vendor $vendor
  * @property Branch $branch
+ * @property GoodsMovement[] $movements
+ * @property GlHeader $gl
+ *
+ * @property boolean $received
+ * @property boolean $posted
  * 
  */
 class Purchase extends \app\classes\ActiveRecord
 {
     public $vendor_name;
+    public $warehouse_id;
 
     /**
      * @inheritdoc
@@ -49,10 +57,10 @@ class Purchase extends \app\classes\ActiveRecord
         return [
             [['vendor_id', 'branch_id', 'Date', 'value', 'status', 'type'], 'required'],
             [['!number'], 'autonumber', 'format' => 'formatNumber', 'digit' => 6],
-            [['type', 'vendor_id', 'branch_id', 'status'], 'integer'],
+            [['type', 'vendor_id', 'branch_id', 'status', 'warehouse_id'], 'integer'],
             [['date', 'vendor_name', 'items'], 'safe'],
             [['value', 'discount'], 'number'],
-            
+            [['items'], 'checkItems', 'skipOnEmpty' => false],
         ];
     }
 
@@ -60,6 +68,13 @@ class Purchase extends \app\classes\ActiveRecord
     {
         $date = date('Ymd');
         return "21{$this->type}.$date.?";
+    }
+
+    public function checkItems()
+    {
+        if (count($this->items) == 0) {
+            $this->addError('items', 'Items cannot empty');
+        }
     }
 
     /**
@@ -92,9 +107,12 @@ class Purchase extends \app\classes\ActiveRecord
         return $this->hasMany(PurchaseDtl::className(), ['purchase_id' => 'id']);
     }
 
-    public function setItems($items)
+    /**
+     * @param array $values
+     */
+    public function setItems($values)
     {
-        $this->items->setRecords($items);
+        $this->loadRelated('items', $values);
     }
 
     /**
@@ -102,7 +120,7 @@ class Purchase extends \app\classes\ActiveRecord
      */
     public function getBranch()
     {
-        return $this->hasOne(Branch::className(), ['id'=>'branch_id']);
+        return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
     }
 
     /**
@@ -110,7 +128,41 @@ class Purchase extends \app\classes\ActiveRecord
      */
     public function getVendor()
     {
-        return $this->hasOne(Vendor::className(), ['id'=>'vendor_id']);
+        return $this->hasOne(Vendor::className(), ['id' => 'vendor_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMovements()
+    {
+        return $this->hasMany(GoodsMovement::className(), ['reff_id' => 'id'])
+                ->onCondition(['{{%goods_movement}}.reff_type' => 211]);
+    }
+
+    /**
+     * @return boolean true when purcahse has received
+     */
+    public function getReceived()
+    {
+        return count($this->movements) > 0;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGl()
+    {
+        return $this->hasOne(GlHeader::className(), ['reff_id' => 'id'])
+                ->onCondition(['{{%gl_header}}.reff_type' => 211]);
+    }
+
+    /**
+     * @return boolean true when purcahse has received
+     */
+    public function getPosted()
+    {
+        return $this->gl !== null;
     }
 
     /**

@@ -5,12 +5,16 @@ namespace app\controllers\purchase;
 use Yii;
 use app\models\purchase\Purchase;
 use app\models\purchase\search\Purchase as PurchaseSearch;
+use app\models\purchase\PurchaseDtl;
 use app\classes\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\master\Draft;
 use yii\db\Query;
 use yii\data\ActiveDataProvider;
+use app\models\inventory\GoodsMovement;
+use yii\web\ForbiddenHttpException;
+use app\models\accounting\GlHeader;
 
 /**
  * PurchaseController implements the CRUD actions for Purchase model.
@@ -80,35 +84,75 @@ class PurchaseController extends Controller
     public function actionCreate($draft_id = null)
     {
         $model = new Purchase();
+        $model->date = date('Y-m-d');
         $request = Yii::$app->getRequest();
-        if ($draft_id && ($draft = Draft::findOne(['id' => $draft_id, 'type' => 210])) !== null) {
+        if ($draft_id && ($draft = Draft::findOne(['id' => $draft_id, 'type' => 211])) !== null) {
             $model->load($draft->value);
         }
         if ($model->load($request->post())) {
             $model->status = 10;
             $model->type = 1;
             if ($request->post('action') == 'draft') {
-                if ($model->validate() && $model->items->validate()) {
+                if ($model->validate() && $model->validateRelation()) {
                     if (!isset($draft)) {
                         $draft = new Draft([
-                            'type' => 210,
+                            'type' => 211,
                         ]);
                     }
-                    $draft->description = $model->vendor_name;
+                    $draft->description = 'Purchase from ' . $model->vendor_name;
                     $draft->value = $request->post();
                     if ($draft->save()) {
-                        return $this->redirect(['draft']);
+                        return $this->redirect(['/master/draft', 'type' => 211]);
                     }
                 }
             } else {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
-                    if ($model->save() && $model->items->save()) {
-                        if(isset($draft)){
+                    if ($model->save() && $model->saveRelation()) {
+                        $success = true;
+                        if ($model->warehouse_id) {
+                            $movement = new GoodsMovement([
+                                'type' => 1, // receive
+                                'reff_type' => 211,
+                                'reff_id' => $model->id,
+                                'warehouse_id' => $model->warehouse_id,
+                                'date' => date('Y-m-d'),
+                                'vendor_id' => $model->vendor_id,
+                                'description' => "GR for purchase [{$model->number}]",
+                                'status' => 10,
+                                'data' => [
+                                    'value' => $model->value,
+                                    'discount' => $model->discount
+                                ]
+                            ]);
+                            $mvDtls = [];
+                            /* @var $purch_item PurchaseDtl */
+                            foreach ($model->items as $purch_item) {
+                                $mvDtls[] = [
+                                    'item_id' => $purch_item->item_id,
+                                    'qty' => $purch_item->qty,
+                                    'cogs' => $purch_item->price,
+                                    'value' => $purch_item->price,
+                                ];
+                            }
+                            $movement->items = $mvDtls;
+                            if ($movement->save() && $movement->saveRelation()) {
+                                $success = true;
+                            } else {
+                                foreach ($movement->firstErrors as $attr => $error) {
+                                    $model->addError('goods_receive', "$attr: $error");
+                                    break;
+                                }
+                                $success = false;
+                            }
+                        }
+                        if (isset($draft)) {
                             $draft->delete();
                         }
-                        $transaction->commit();
-                        return $this->redirect(['view', 'id' => $model->id]);
+                        if ($success) {
+                            $transaction->commit();
+                            return $this->redirect(['view', 'id' => $model->id]);
+                        }
                     }
                     $transaction->rollBack();
                 } catch (\Exception $exc) {
@@ -132,15 +176,53 @@ class PurchaseController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if($model->vendor){
+        if ($model->received) {
+            throw new ForbiddenHttpException('Update cann\'t be allowed');
+        }
+        if ($model->vendor) {
             $model->vendor_name = $model->vendor->name;
         }
         if ($model->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                if ($model->save() && $model->items->save()) {
-
+                if ($model->save() && $model->saveRelation()) {
+                    $success = true;
+                    if ($model->warehouse_id) {
+                        $movement = new GoodsMovement([
+                            'type' => 1, // receive
+                            'reff_type' => 211,
+                            'reff_id' => $model->id,
+                            'warehouse_id' => $model->warehouse_id,
+                            'date' => date('Y-m-d'),
+                            'vendor_id' => $model->vendor_id,
+                            'description' => "GR for purchase [{$model->number}]",
+                            'status' => 10,
+                            'data' => [
+                                'value' => $model->value,
+                                'discount' => $model->discount
+                            ]
+                        ]);
+                        $mvDtls = [];
+                        /* @var $purch_item PurchaseDtl */
+                        foreach ($model->items as $purch_item) {
+                            $mvDtls[] = [
+                                'item_id' => $purch_item->item_id,
+                                'qty' => $purch_item->qty,
+                                'cogs' => $purch_item->price,
+                                'value' => $purch_item->price,
+                            ];
+                        }
+                        $movement->items = $mvDtls;
+                        if ($movement->save() && $movement->saveRelation()) {
+                            $success = true;
+                        } else {
+                            foreach ($movement->firstErrors as $attr => $error) {
+                                $model->addError('goods_receive', "$attr: $error");
+                                break;
+                            }
+                            $success = false;
+                        }
+                    }
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
@@ -153,6 +235,31 @@ class PurchaseController extends Controller
         return $this->render('update', [
                 'model' => $model,
         ]);
+    }
+
+    public function actionPost($id)
+    {
+        $model = $this->findModel($id);
+        if (!$model->received || $model->posted) {
+            throw new ForbiddenHttpException('Posting cann\'t be allowed');
+        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $gl = new GlHeader([
+                'branch_id' => $model->branch_id,
+                'reff_type' => 211,
+                'reff_id' => $model->id,
+            ]);
+            if ($model->save() && $model->items->save()) {
+                
+                $transaction->commit();
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+            $transaction->rollBack();
+        } catch (\Exception $exc) {
+            $transaction->rollBack();
+            throw $exc;
+        }
     }
 
     /**
@@ -192,6 +299,9 @@ class PurchaseController extends Controller
         $masters['vendors'] = (new Query())
             ->from('{{%vendor}}')
             ->where(['type' => 2])
+            ->all();
+        $masters['warehouses'] = (new Query())
+            ->from('{{%warehouse}}')
             ->all();
 
         Yii::$app->getResponse()->format = 'js';

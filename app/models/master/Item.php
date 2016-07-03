@@ -13,7 +13,7 @@ use Yii;
  * @property string $barcode
  * @property string $name
  * @property string $uom
- * @property integer $isi
+ * @property integer $volume
  * @property integer $created_at
  * @property integer $created_by
  * @property integer $updated_at
@@ -41,8 +41,8 @@ class Item extends \app\classes\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'code', 'name', 'uom', 'isi'], 'required'],
-            [['product_id', 'isi'], 'integer'],
+            [['product_id', 'code', 'name', 'uom', 'volume'], 'required'],
+            [['product_id', 'volume'], 'integer'],
             [['code'], 'string', 'max' => 20],
             [['barcode'], 'string', 'max' => 13],
             [['name'], 'string', 'max' => 64],

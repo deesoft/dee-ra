@@ -109,3 +109,21 @@ function calculateTotal() {
     $('#purchase-value').val(total);
     $('#total').text(total);
 }
+
+$('#purchase-branch_id').change(function () {
+    changeBranch($(this).val());
+});
+
+changeBranch($('#purchase-branch_id').val(), $('#init_wh_id').val());
+
+function changeBranch(id, wh_id) {
+    $('#purchase-warehouse_id > option:gt(0)').remove();
+    $.each(MASTERS.warehouses, function () {
+        if (this.branch_id == id) {
+            $('#purchase-warehouse_id').append($('<option>').val(this.id).text(this.name));
+        }
+    });
+    if (wh_id) {
+        $('#purchase-warehouse_id').val(wh_id);
+    }
+}

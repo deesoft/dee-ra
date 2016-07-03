@@ -67,4 +67,9 @@ class AccPeriode extends \app\classes\ActiveRecord
     {
         return $this->hasMany(GlHeader::className(), ['periode_id' => 'id']);
     }
+
+    public static function getActivePeriode()
+    {
+        return static::find()->select('id')->where(['status'=>10])->scalar();
+    }
 }

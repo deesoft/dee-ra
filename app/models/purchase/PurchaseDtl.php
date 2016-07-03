@@ -16,6 +16,8 @@ use app\models\master\Item;
  * @property string $extra
  *
  * @property Purchase $purchase
+ * @property Item $item
+ * 
  */
 class PurchaseDtl extends \app\classes\ActiveRecord
 {

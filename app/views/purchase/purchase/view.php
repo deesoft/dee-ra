@@ -16,6 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
+        <?php if(!$model->received): ?>
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->id], [
@@ -26,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ])
         ?>
+        <?php endif;?>
     </p>
 
     <div class="row">
@@ -35,10 +37,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'model' => $model,
                 'attributes' => [
                     'number',
-                    'vendor.name',
-                    'branch.name',
+                    'vendor.name:text:Supplier',
+                    'branch.name:text:Branch',
                     'date:date',
-                    'value',
+                    'value:currency',
                     'discount',
                 ],
             ])
@@ -48,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="nav-tabs-justified col-lg-8"  style="margin-top: 20px;">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#item" data-toggle="tab" aria-expanded="false">Items</a></li>
-                <li><a href="#notes" data-toggle="tab" aria-expanded="false">Notes</a></li>
+                <li><a href="#receives" data-toggle="tab" aria-expanded="false">Receives</a></li>
             </ul>
             <div class="tab-content" >
                 <div class="tab-pane active" id="item">
@@ -80,8 +82,24 @@ $this->params['breadcrumbs'][] = $this->title;
                     ])
                     ?>
                 </div>
-                <div class="tab-pane" id="notes">
-
+                <div class="tab-pane" id="receives">
+                    <?=
+                    GridView::widget([
+                        'dataProvider' => new yii\data\ActiveDataProvider([
+                            'query' => $model->getMovements(),
+                            'pagination' => false,
+                            'sort' => false,
+                            ]),
+                        'tableOptions' => ['class' => 'table table-hover'],
+                        'layout' => '{items}',
+                        'columns' => [
+                            ['class' => 'yii\grid\SerialColumn'],
+                            'number',
+                            'warehouse.name:text:Warehouse',
+                            'date:date'
+                        ]
+                    ])
+                    ?>
                 </div>
             </div>
         </div>

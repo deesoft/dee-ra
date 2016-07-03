@@ -102,7 +102,7 @@ class m160201_050010_create_table_master extends \yii\db\Migration
             'barcode' => $this->string(13),
             'name' => $this->string(64)->notNull(),
             'uom' => $this->string(32)->notNull(),
-            'isi' => $this->integer()->notNull(),
+            'volume' => $this->integer()->notNull(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),
@@ -231,7 +231,7 @@ class m160201_050010_create_table_master extends \yii\db\Migration
 
         $this->createTable('{{%draft}}', [
             'id' => $this->primaryKey(),
-            'type' => $this->integer()->notNull(),
+            'url' => $this->string()->notNull(),
             'data' => $this->binary(),
             // history column
             'created_at' => $this->integer(),
