@@ -30,6 +30,7 @@ use Yii;
  */
 class Payment extends \app\classes\ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
@@ -44,15 +45,21 @@ class Payment extends \app\classes\ActiveRecord
     public function rules()
     {
         return [
-            [['number', 'type', 'branch_id', 'vendor_id', 'date', 'method', 'coa_id', 'value', 'status'], 'required'],
-            [['type', 'branch_id', 'vendor_id', 'coa_id', 'potongan_coa_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
+            [['type', 'branch_id', 'vendor_id', 'date', 'method', 'coa_id', 'value', 'status'], 'required'],
+            [['type', 'branch_id', 'vendor_id', 'coa_id', 'potongan_coa_id', 'status'], 'integer'],
             [['date'], 'safe'],
             [['value', 'potongan'], 'number'],
-            [['number'], 'string', 'max' => 20],
+            [['!number'], 'autonumber', 'format' => 'formatNumber', 'digit' => '6'],
             [['method'], 'string', 'max' => 32],
             [['coa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Coa::className(), 'targetAttribute' => ['coa_id' => 'id']],
             [['potongan_coa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Coa::className(), 'targetAttribute' => ['potongan_coa_id' => 'id']],
         ];
+    }
+
+    public function formatNumber()
+    {
+        $date = date('Ymd');
+        return "27{$this->type}.$date.?";
     }
 
     /**

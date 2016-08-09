@@ -11,6 +11,7 @@ use Yii;
  */
 class ActiveRecord extends \yii\db\ActiveRecord
 {
-    use RelationTrait;
+    use \dee\db\RelationTrait,
+    \mdm\converter\EnumTrait;
     
 }

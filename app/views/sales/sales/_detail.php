@@ -20,10 +20,10 @@ use yii\helpers\Html;
                 Product Name
             </th>
             <th class="items" style="width: 15%">
-                Qty
+                Price
             </th>
             <th class="items" style="width: 15%">
-                Price
+                Qty
             </th>
             <th style="width: 15%">
                 Total Line

@@ -9,8 +9,9 @@ use Yii;
  *
  * @property integer $id
  * @property integer $invoice_id
- * @property integer $item_id
  * @property string $item
+ * @property integer $item_type
+ * @property integer $item_id
  * @property double $qty
  * @property double $value
  *
@@ -32,11 +33,11 @@ class InvoiceDtl extends \app\classes\ActiveRecord
     public function rules()
     {
         return [
-            [['invoice_id', 'item', 'value'], 'required'],
+            [['item', 'value'], 'required'],
             [['invoice_id', 'item_id'], 'integer'],
             [['qty', 'value'], 'number'],
             [['item'], 'string', 'max' => 64],
-            [['invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => Invoice::className(), 'targetAttribute' => ['invoice_id' => 'id']],
+            //[['invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => Invoice::className(), 'targetAttribute' => ['invoice_id' => 'id']],
         ];
     }
 

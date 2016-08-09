@@ -3,6 +3,8 @@
 namespace app\models\accounting;
 
 use Yii;
+use app\models\master\Vendor;
+use app\models\master\Branch;
 
 /**
  * This is the model class for table "{{%invoice}}".
@@ -25,12 +27,19 @@ use Yii;
  * @property integer $created_by
  * @property integer $updated_at
  * @property integer $updated_by
+ * @property string $nmStatus
  *
- * @property InvoiceDtl[] $invoiceDtls
+ * @property Vendor $vendor
+ * @property Branch $branch
+ * @property InvoiceDtl[] $items
  * @property PaymentDtl[] $paymentDtls
+ * @property InvoicePaid $paid
  */
 class Invoice extends \app\classes\ActiveRecord
 {
+    const TYPE_INCOMING = 1;
+    const TYPE_OUTGOING = 2;
+
     /**
      * @inheritdoc
      */
@@ -45,8 +54,9 @@ class Invoice extends \app\classes\ActiveRecord
     public function rules()
     {
         return [
-            [['number', 'type', 'branch_id', 'date', 'due_date', 'vendor_id', 'status', 'value'], 'required'],
-            [['type', 'branch_id', 'vendor_id', 'reff_type', 'reff_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
+            [['type', 'branch_id', 'date', 'due_date', 'vendor_id', 'status', 'value'], 'required'],
+            [['type', 'branch_id', 'vendor_id', 'reff_type', 'reff_id', 'status'], 'integer'],
+            [['!number'], 'autonumber', 'format' => 'formatNumber', 'digit' => 6],
             [['date', 'due_date'], 'safe'],
             [['value', 'tax_value'], 'number'],
             [['number'], 'string', 'max' => 20],
@@ -54,6 +64,11 @@ class Invoice extends \app\classes\ActiveRecord
         ];
     }
 
+    public function formatNumber()
+    {
+        $date = date('Ymd');
+        return "28{$this->type}.$date.?";
+    }
     /**
      * @inheritdoc
      */
@@ -84,9 +99,14 @@ class Invoice extends \app\classes\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getInvoiceDtls()
+    public function getItems()
     {
         return $this->hasMany(InvoiceDtl::className(), ['invoice_id' => 'id']);
+    }
+
+    public function setItems($values)
+    {
+        $this->loadRelated('items', $values);
     }
 
     /**
@@ -95,5 +115,38 @@ class Invoice extends \app\classes\ActiveRecord
     public function getPaymentDtls()
     {
         return $this->hasMany(PaymentDtl::className(), ['invoice_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVendor()
+    {
+        return $this->hasOne(Vendor::className(), ['id' => 'vendor_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBranch()
+    {
+        return $this->hasOne(Vendor::className(), ['id' => 'branch_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaid()
+    {
+        return $this->hasOne(InvoicePaid::className(), ['invoice_id' => 'id']);
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getNmType()
+    {
+        return $this->getLogical('type', 'TYPE_');
     }
 }

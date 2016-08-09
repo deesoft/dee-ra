@@ -24,7 +24,8 @@
         "mdmsoft/yii2-admin": "~2.0",
         "mdmsoft/yii2-widgets": "~1.0",
         "rmrevin/yii2-fontawesome": "~2.0",
-        "almasaeed2010/adminlte": "~2.0"
+        "almasaeed2010/adminlte": "~2.0",
+        "deesoft/yii2-db": "~1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0",
@@ -41,6 +42,6 @@
         "asset-vcs-driver-options": {
             "github-no-api": true
         },
-        "asset-pattern-skip-version": "(-build)"
+        "asset-pattern-skip-version": "(-build|-patch)"
     }
 }

@@ -231,7 +231,8 @@ class m160201_050010_create_table_master extends \yii\db\Migration
 
         $this->createTable('{{%draft}}', [
             'id' => $this->primaryKey(),
-            'url' => $this->string()->notNull(),
+            'type' => $this->integer()->notNull(),
+            'subtype' => $this->integer(),
             'data' => $this->binary(),
             // history column
             'created_at' => $this->integer(),

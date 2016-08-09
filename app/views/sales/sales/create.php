@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 
+
 /* @var $this yii\web\View */
 /* @var $model app\models\purchase\Purchase */
 
@@ -10,13 +11,9 @@ $this->params['breadcrumbs'][] = ['label' => 'Purchases', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="purchase-create">
-    <h1>Create Purchase</h1>
 
-    <?=
-    $this->render('_form', [
+    <?= $this->render('_form', [
         'model' => $model,
-        'allowDraft' => true,
-    ])
-    ?>
+    ]) ?>
 
 </div>

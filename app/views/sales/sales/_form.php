@@ -23,7 +23,7 @@ $branchs = Branch::options();
     ]);
     ?>
     <?= $form->errorSummary($model); ?>
-    <div class="row">
+    
         <div class="col-lg-4 form-horizontal">
             <?= Html::hiddenInput('', $model->warehouse_id, ['id' => 'init_wh_id']) ?>
             <?= $form->field($model, 'branch_id')->dropDownList($branchs)->label('Branch') ?>
@@ -43,8 +43,8 @@ $branchs = Branch::options();
             <div class="form-group">
                 <div class="col-sm-offset-4 col-sm-8">
                     <?=
-                    empty($allowDraft) ? '' : Html::submitButton('Draft', ['class' => 'btn btn-info',
-                            'name' => 'action', 'value' => 'draft'])
+                    $model->isNewRecord ? Html::submitButton('Draft', ['class' => 'btn btn-info',
+                            'name' => 'action', 'value' => 'draft']) : ''
                     ?>
                     <?=
                     Html::submitButton('Save', ['class' => 'btn btn-success', 'name' => 'action',
@@ -56,7 +56,6 @@ $branchs = Branch::options();
         <div class="col-lg-8">
             <?= $this->render('_detail', ['form' => $form, 'model' => $model]) ?>
         </div>
-    </div>
 
     <?php ActiveForm::end(); ?>
 

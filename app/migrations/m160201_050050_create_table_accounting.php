@@ -103,7 +103,7 @@ class m160201_050050_create_table_accounting extends \yii\db\Migration
             'status' => $this->integer()->notNull(),
             'description' => $this->string(64),
             'value' => $this->float()->notNull(),
-            'tax_type' => $this->string(64),
+            'tax' => $this->string(64),
             'tax_value' => $this->float(),
             // history column
             'created_at' => $this->integer(),
@@ -115,11 +115,10 @@ class m160201_050050_create_table_accounting extends \yii\db\Migration
         $this->createTable('{{%invoice_dtl}}', [
             'id' => $this->primaryKey(),
             'invoice_id' => $this->integer()->notNull(),
-            'item_id' => $this->integer(),
             'item' => $this->string(64)->notNull(),
+            'item_id' => $this->integer(),
             'qty' => $this->float(),
             'value' => $this->float()->notNull(),
-            'reff_id' => $this->integer(),
             // constrain
             'FOREIGN KEY ([[invoice_id]]) REFERENCES {{%invoice}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
             ], $tableOptions);

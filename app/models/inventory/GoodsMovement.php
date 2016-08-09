@@ -4,6 +4,8 @@ namespace app\models\inventory;
 
 use Yii;
 use app\models\master\Warehouse;
+use app\classes\RelatedEvent;
+use app\models\accounting\Invoice;
 
 /**
  * This is the model class for table "{{%goods_movement}}".
@@ -31,6 +33,17 @@ use app\models\master\Warehouse;
  */
 class GoodsMovement extends \app\classes\ActiveRecord
 {
+
+    public function init()
+    {
+        parent::init();
+        $this->on('beforeRelatedSave', function($event) {
+            /* @var $event RelatedEvent */
+            if ($event->relationName === 'items') {
+                $event->isValid = $event->item->qty != '' && $event->item->qty != 0;
+            }
+        });
+    }
 
     /**
      * @inheritdoc
@@ -120,6 +133,78 @@ class GoodsMovement extends \app\classes\ActiveRecord
     }
 
     /**
+     *
+     * @return Invoice
+     */
+    public function createInvoice()
+    {
+        $model = new Invoice([
+            'type' => $this->type === 1 || $this->type === '1' ? 2 : 1,
+            'reff_type' => 221,
+            'reff_id' => $this->id,
+            'vendor_id' => $this->vendor_id,
+            'branch_id' => $this->warehouse->branch_id,
+            'date' => date('Y-m-d'),
+            'due_date' => date('Y-m-d', time() + 30 * 24 * 3600),
+            'description' => "Invoice for [{$this->number}]",
+            'status' => 10,
+        ]);
+        $items = [];
+        $total = 0;
+        foreach ($this->items as $item) {
+            $items[] = [
+                'item' => $item->item->name,
+                'item_id' => $item->item_id,
+                'qty' => $item->qty,
+                'value' => $item->value,
+            ];
+            $total += $item->qty * $item->value;
+        }
+        $model->value = $total;
+        $model->items = $items;
+        return $model;
+    }
+
+    public function applyStock($factor)
+    {
+        // update stock
+        $wh_id = $this->warehouse_id;
+        $mv_id = $this->id;
+        $factor = $factor * ($this->type == 1 ? 1 : -1);
+        $command = Yii::$app->db->createCommand();
+        foreach ($this->items as $item) {
+            $product_id = $item->item->product_id;
+            $qty = $factor * $item->qty * $item->item->volume;
+            $ps = ProductStock::findOne(['product_id' => $product_id, 'warehouse_id' => $wh_id]);
+            if ($ps) {
+                $ps->qty = new Expression('[[qty]] + :added', [':added' => $qty]);
+            } else {
+                $ps = new ProductStock(['product_id' => $product_id, 'warehouse_id' => $wh_id, 'qty' => $qty]);
+            }
+            if (!$ps->save(false) || !$ps->refresh() || !$command->insert('{{%product_stock_history}}', [
+                    'time' => microtime(true),
+                    'warehouse_id' => $wh_id,
+                    'product_id' => $product_id,
+                    'qty_movement' => $qty,
+                    'qty_current' => $ps->qty,
+                    'movement_id' => $mv_id,
+                ])->execute()) {
+                return false;
+            }
+            if ($item->cogs !== null && $item->cogs !== '') {
+                $paramCogs = [
+                    'id' => $product_id,
+                    'qty' => $qty,
+                    'cogs' => $item->cogs,
+                ];
+                if (!$this->updateCogs($paramCogs)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    /**
      * @inheritdoc
      */
     public function behaviors()
@@ -136,7 +221,7 @@ class GoodsMovement extends \app\classes\ActiveRecord
             [
                 'class' => 'app\classes\ArrayConverter',
                 'attributes' => [
-                    'data' => 'extra_data', // date is original attribute
+                    'data' => 'extra_data', // extra_data is original attribute
                 ]
             ],
             'yii\behaviors\BlameableBehavior',

@@ -1,7 +1,6 @@
 <?php
 $params = array_merge(
-    require(__DIR__ . '/params.php'),
-    require(__DIR__ . '/params-local.php')
+    require(__DIR__ . '/params.php'), require(__DIR__ . '/params-local.php')
 );
 
 return [
@@ -9,6 +8,12 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'app\controllers',
+    'modules' => [
+        'admin' => [
+            'class' => 'mdm\admin\Module',
+            'layout'=>'top-menu'
+        ]
+    ],
     'components' => [
         'user' => [
             'identityClass' => 'app\models\ar\User',

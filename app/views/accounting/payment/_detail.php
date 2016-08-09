@@ -7,7 +7,7 @@ use app\models\purchase\PurchaseDtl;
 use yii\helpers\Html;
 
 /* @var $this View */
-/* @var $model Purchase */
+/* @var $model Payment */
 ?>
 <div style="display: none;">
     <?= Html::activeHiddenInput($model, 'value')?>
@@ -17,10 +17,10 @@ use yii\helpers\Html;
         <tr>
             <th style="width: 40px">#</th>
             <th>
-                Product Name
+                Invoice Number
             </th>
             <th class="items" style="width: 15%">
-                Qty
+                Value
             </th>
             <th class="items" style="width: 15%">
                 Price

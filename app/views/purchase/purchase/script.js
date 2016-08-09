@@ -70,13 +70,25 @@ $('#input-product').autocomplete({
 function selectProduct(item) {
     $("#input-product").val('');
 
-    var $row = $('#detail-grid').mdmTabularInput('addRow');
-    var itemPrice = item.price;
+    var found = false;
+    $('#detail-grid > tr').each(function () {
+        var $row = $(this);
+        if ($row.find(':input[data-field="item_id"]').val() == item.id) {
+            found = true;
+            var qty = $row.find(':input[data-field="qty"]').val();
+            $row.find(':input[data-field="qty"]').val((qty ? qty * 1 : 0) + 1).select().focus();
+            return false;
+        }
+    });
+    if (!found) {
+        var $row = $('#detail-grid').mdmTabularInput('addRow');
+        var itemPrice = item.price;
 
-    $row.find(':input[data-field="item_id"]').val(item.id);
-    $row.find('span[data-field="item"]').text(item.name);
-    $row.find(':input[data-field="qty"]').val(1);
-    $row.find(':input[data-field="price"]').val(itemPrice).focus();
+        $row.find(':input[data-field="item_id"]').val(item.id);
+        $row.find('span[data-field="item"]').text(item.name);
+        $row.find(':input[data-field="qty"]').val(1).select().focus();
+        $row.find(':input[data-field="price"]').val(itemPrice);
+    }
     calculateTotal();
 }
 
@@ -84,9 +96,9 @@ $('#detail-grid').on('keydown', ':input', function (e) {
     var th = $(this);
     var $row = th.closest('tr');
     if (e.which == 13) {
-        if (th.data('field') == 'price') {
-            $row.find(':input[data-field="qty"]').focus();
-        } else if (th.data('field') == 'qty') {
+        if (th.data('field') == 'qty') {
+            $row.find(':input[data-field="price"]').select().focus();
+        } else if (th.data('field') == 'price') {
             $("#input-product").focus();
         }
         return false;
@@ -117,7 +129,7 @@ $('#purchase-branch_id').change(function () {
 changeBranch($('#purchase-branch_id').val(), $('#init_wh_id').val());
 
 function changeBranch(id, wh_id) {
-    $('#purchase-warehouse_id > option:gt(0)').remove();
+    $('#purchase-warehouse_id > option').remove();
     $.each(MASTERS.warehouses, function () {
         if (this.branch_id == id) {
             $('#purchase-warehouse_id').append($('<option>').val(this.id).text(this.name));

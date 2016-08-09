@@ -59,6 +59,9 @@ class Purchase extends \app\classes\ActiveRecord
             [['!number'], 'autonumber', 'format' => 'formatNumber', 'digit' => 6],
             [['type', 'vendor_id', 'branch_id', 'status', 'warehouse_id'], 'integer'],
             [['date', 'vendor_name', 'items'], 'safe'],
+            [['vendor_name'], 'required', 'when' => function() {
+                return empty($this->vendor_id);
+            }],
             [['value', 'discount'], 'number'],
             [['items'], 'checkItems', 'skipOnEmpty' => false],
         ];
@@ -87,7 +90,9 @@ class Purchase extends \app\classes\ActiveRecord
             'type' => 'Type',
             'number' => 'Number',
             'vendor_id' => 'Vendor ID',
+            'vendor_name' => 'Supplier',
             'branch_id' => 'Branch ID',
+            'warehouse_id' => 'Receive To',
             'date' => 'Date',
             'value' => 'Value',
             'discount' => 'Discount',
@@ -163,6 +168,44 @@ class Purchase extends \app\classes\ActiveRecord
     public function getPosted()
     {
         return $this->gl !== null;
+    }
+
+    /**
+     *
+     * @return GoodsMovement
+     */
+    public function createGR()
+    {
+        $type = 210 + $this->type;
+        $model = new GoodsMovement([
+            'type' => 1, // receive
+            'reff_type' => $type,
+            'reff_id' => $this->id,
+            'date' => date('Y-m-d'),
+            'vendor_id' => $this->vendor_id,
+            'description' => "GR for purchase [{$this->number}]",
+            'status' => 10,
+        ]);
+
+        $items = (new Query())
+            ->select(['reff_id' => 'pd.id', 'pd.item_id', 'pd.qty', 'received' => 'sum([[md.qty]])', 'value' => 'pd.price'])
+            ->from(['pd' => '{{%purchase_dtl}}'])
+            ->leftJoin(['m' => '{{%goods_movement}}'], "[[m.reff_id]]=[[pd.purchase_id]] and [[reff_type]]={$type}")
+            ->leftJoin(['md' => '{{%goods_movement_dtl}}'], '[[md.movement_id]]=[[m.id]] and [[md.reff_id]]=[[pd.id]]')
+            ->groupBy(['pd.id'])
+            ->where(['pd.purchase_id' => $this->id])
+            ->all();
+        foreach ($items as &$item) {
+            $item['extra'] = [
+                'qty_null' => true,
+                'origin' => $item['qty'],
+                'received' => $item['received'],
+            ];
+            $item['qty'] = $item['qty'] - $item['received'];
+            $item['cogs'] = $item['value'];
+        }
+        $model->items = $items;
+        return $model;
     }
 
     /**
