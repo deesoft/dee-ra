@@ -38,5 +38,5 @@ INSTALLATION
 ------------
 
 ```
-composer create-project deesoft/yii2-app-single myapp
+composer create-project deesoft/yii2-simple-erp myapp
 ```

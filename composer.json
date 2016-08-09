@@ -1,7 +1,7 @@
 {
-    "name": "deesoft/yii2-mini-erp",
+    "name": "deesoft/yii2-simple-erp",
     "description": "Simple ERP",
-    "keywords": ["yii2", "framework", "advanced", "project template"],
+    "keywords": ["yii2", "erp", "project template"],
     "type": "project",
     "license": "BSD-3-Clause",
     "support": {
