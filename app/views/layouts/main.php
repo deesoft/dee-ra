@@ -2,15 +2,13 @@
 
 use yii\helpers\Html;
 use app\assets\AdminLteAsset;
-use app\widgets\SideNav;
 use yii\widgets\Breadcrumbs;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
 
 AdminLteAsset::register($this);
-$this->registerJs($this->render('adminlte.js'));
-$this->registerCss($this->render('easyui.css'));
+//$this->registerJs($this->render('adminlte.js'));
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -23,25 +21,14 @@ $this->registerCss($this->render('easyui.css'));
         <?php $this->head() ?>
     </head>
     <?php $this->beginBody() ?>
-    <body class="skin-red sidebar-mini sidebar-collapse">
+    <body class="skin-red sidebar-mini">
         <div class="wrapper">
             <?= $this->render('header'); ?>
-            <aside class="main-sidebar">
-                <section class="sidebar">
-                    <?php
-                    echo SideNav::widget([
-                        'options' => [
-                            'class' => 'sidebar-menu',
-                        ],
-                        'items' => [],
-                    ]);
-                    ?>
-                </section>
-            </aside>
+            <?= $this->render('sidebar'); ?>
             <div class="content-wrapper" >
                 <section class="content-header">
-                    <?=
-                    Breadcrumbs::widget([
+                    <?php
+                    echo Breadcrumbs::widget([
                         'homeLink' => ['label' => Yii::t('yii', 'Home'), 'url' => Yii::$app->homeUrl],
                         'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
                     ])

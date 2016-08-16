@@ -27,6 +27,8 @@ use Yii;
 class GlHeader extends \app\classes\ActiveRecord
 {
 
+    const TRANS_CODE = 290;
+
     /**
      * @inheritdoc
      */

@@ -1,4 +1,4 @@
-Yii 2 Single Project Template
+Dee Ritail Application (Dee RA)
 ===============================
 
 Yii 2 Single Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
@@ -20,6 +20,7 @@ DIRECTORY STRUCTURE
 ```
 app
     assets/              contains application assets such as JavaScript and CSS
+    classes/             
     command/             contains console command classes
     config/              contains app configurations
     controllers/         contains Web controller classes
@@ -38,5 +39,5 @@ INSTALLATION
 ------------
 
 ```
-composer create-project deesoft/yii2-simple-erp myapp
+composer create-project deesoft/yii2-ra myapp
 ```

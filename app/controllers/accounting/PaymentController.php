@@ -8,6 +8,7 @@ use app\models\accounting\search\Payment as PaymentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\db\Query;
 
 /**
  * PaymentController implements the CRUD actions for Payment model.
@@ -41,6 +42,16 @@ class PaymentController extends Controller
         ]);
     }
 
+    public function actionMaster()
+    {
+        $masters = [];
+        $masters['vendors'] = (new Query())
+            ->from('{{%vendor}}')
+            ->all();
+
+        Yii::$app->getResponse()->format = 'js';
+        return 'var MASTERS = ' . json_encode($masters) . ';';
+    }
     /**
      * Displays a single Payment model.
      * @param integer $id

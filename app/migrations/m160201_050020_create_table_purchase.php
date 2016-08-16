@@ -24,7 +24,7 @@ class m160201_050020_create_table_purchase extends \yii\db\Migration
             'date' => $this->date()->notNull(),
             'value' => $this->float()->notNull(),
             'discount' => $this->float(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),

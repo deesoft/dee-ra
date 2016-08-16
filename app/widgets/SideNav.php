@@ -57,6 +57,7 @@ class SideNav extends Widget
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = [];
+
     /**
      * @var array list of items in the nav widget. Each array element represents a single
      * menu item which can be either a string or an array with the following structure:
@@ -74,20 +75,24 @@ class SideNav extends Widget
      * If a menu item is a string, it will be rendered directly without HTML encoding.
      */
     public $items = [];
+
     /**
      * @var boolean whether the nav items labels should be HTML-encoded.
      */
     public $encodeLabels = false;
+
     /**
      * @var boolean whether to automatically activate items according to whether their route setting
      * matches the currently requested route.
      * @see isItemActive
      */
     public $activateItems = true;
+
     /**
      * @var boolean whether to activate parent menu items when one of the corresponding child menu items is active.
      */
     public $activateParents = true;
+
     /**
      * @var string the route used to determine if a menu item is active or not.
      * If not set, it will use the route of the current request.
@@ -95,6 +100,7 @@ class SideNav extends Widget
      * @see isItemActive
      */
     public $route;
+
     /**
      * @var array the parameters used to determine if a menu item is active or not.
      * If not set, it will use `$_GET`.
@@ -102,6 +108,7 @@ class SideNav extends Widget
      * @see isItemActive
      */
     public $params;
+
     /**
      * @var string this property allows you to customize the HTML which is used to generate the drop down caret symbol,
      * which is displayed next to the button text to indicate the drop down functionality.
@@ -125,7 +132,7 @@ class SideNav extends Widget
             $this->params = Yii::$app->request->getQueryParams();
         }
         if ($this->treeviewCaret === null) {
-            $this->treeviewCaret = FA::icon('angle-left')->pullRight();
+            $this->treeviewCaret = '<i class="fa fa-angle-left pull-right"></i>';
         }
         Html::addCssClass($this->options, ['widget' => 'sidebar-menu']);
     }
@@ -149,7 +156,7 @@ class SideNav extends Widget
             if (isset($item['visible']) && !$item['visible']) {
                 continue;
             }
-            $lines[] = $this->renderItem($item);
+            $lines[] = $this->renderItem($item, true);
         }
 
         return Html::tag('ul', implode("\n", $lines), $options);
@@ -161,7 +168,7 @@ class SideNav extends Widget
      * @return string the rendering result.
      * @throws InvalidConfigException
      */
-    public function renderItem($item)
+    public function renderItem($item, $span = false)
     {
         if (is_string($item)) {
             return $item;
@@ -174,16 +181,20 @@ class SideNav extends Widget
         if ($encodeLabel) {
             $label = Html::encode($label);
         }
-        $label = "<span>$label</span>";
-
-        $icon = ArrayHelper::getValue($item, 'icon', empty($item['items']) ? 'check' : 'th');
+        if ($span) {
+            $label = "<span>$label</span>\n";
+        }
+        $icon = ArrayHelper::getValue($item, 'icon');
         if ($icon) {
-            $label = FA::icon($icon) . ' ' . $label;
+            $iconOptions = ArrayHelper::getValue($item, 'iconOptions', []);
+            Html::addCssClass($iconOptions, ['fa', 'fa-' . $icon]);
+            $label = Html::tag('i', '', $iconOptions) . ' ' . $label;
         }
         $badge = ArrayHelper::getValue($item, 'badge');
         if (!empty($badge)) {
-            $badgeColor = ArrayHelper::getValue($item, 'badgeColor', 'red');
-            $label .= ' ' . Html::tag('small', $badge, ['class' => 'badge pull-right bg-' . $badgeColor]);
+            $badgeOptions = ArrayHelper::getValue($item, 'badgeOptions', []);
+            Html::addCssClass($badgeOptions, ['badge', 'pull-right']);
+            $label .= ' ' . Html::tag('small', $badge, $badgeOptions);
         }
         $options = ArrayHelper::getValue($item, 'options', []);
         $items = ArrayHelper::getValue($item, 'items');
@@ -196,7 +207,7 @@ class SideNav extends Widget
             $active = $this->isItemActive($item);
         }
 
-        if ($items !== null) {
+        if (!empty($items)) {
             Html::addCssClass($options, ['widget' => 'treeview']);
             if ($this->treeviewCaret !== '') {
                 $label .= ' ' . $this->treeviewCaret;
@@ -207,6 +218,8 @@ class SideNav extends Widget
                 }
                 $items = $this->renderItems($items, ['class' => 'treeview-menu']);
             }
+        }  else {
+            $items = '';
         }
 
         if ($this->activateItems && $active) {
@@ -247,9 +260,6 @@ class SideNav extends Widget
      */
     protected function isItemActive($item)
     {
-        if (Route::$currentName && $item['name'] == Route::$currentName) {
-            return true;
-        }
         if (isset($item['url']) && is_array($item['url']) && isset($item['url'][0])) {
             $route = $item['url'][0];
             if ($route[0] !== '/' && Yii::$app->controller) {

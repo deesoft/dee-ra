@@ -37,7 +37,7 @@ class m160201_050050_create_table_accounting extends \yii\db\Migration
             'name' => $this->string(32)->notNull(),
             'date_from' => $this->date()->notNull(),
             'date_to' => $this->date()->notNull(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),
@@ -70,7 +70,7 @@ class m160201_050050_create_table_accounting extends \yii\db\Migration
             'reff_type' => $this->integer()->notNull(),
             'reff_id' => $this->integer(),
             'description' => $this->string()->notNull(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),
@@ -100,11 +100,12 @@ class m160201_050050_create_table_accounting extends \yii\db\Migration
             'vendor_id' => $this->integer()->notNull(),
             'reff_type' => $this->integer(),
             'reff_id' => $this->integer(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             'description' => $this->string(64),
             'value' => $this->float()->notNull(),
             'tax' => $this->string(64),
             'tax_value' => $this->float(),
+            'paid' => $this->float(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),
@@ -149,7 +150,7 @@ class m160201_050050_create_table_accounting extends \yii\db\Migration
             'value' => $this->float()->notNull(),
             'potongan_coa_id' => $this->integer(),
             'potongan' => $this->float(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),

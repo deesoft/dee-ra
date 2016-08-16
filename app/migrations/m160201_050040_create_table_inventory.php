@@ -21,7 +21,7 @@ class m160201_050040_create_table_inventory extends \yii\db\Migration
             'branch_id' => $this->integer()->notNull(),
             'branch_dest_id' => $this->integer()->notNull(),
             'date' => $this->date()->notNull(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             'description' => $this->string(),
             // history column
             'created_at' => $this->integer(),
@@ -44,7 +44,7 @@ class m160201_050040_create_table_inventory extends \yii\db\Migration
             'number' => $this->string(20)->notNull(),
             'warehouse_id' => $this->integer()->notNull(),
             'date' => $this->date()->notNull(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             'description' => $this->string(),
             'operator' => $this->string(),
             // history column
@@ -70,7 +70,7 @@ class m160201_050040_create_table_inventory extends \yii\db\Migration
             'date' => $this->date()->notNull(),
             'reff_id' => $this->integer(),
             'description' => $this->string(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),
@@ -99,7 +99,7 @@ class m160201_050040_create_table_inventory extends \yii\db\Migration
             'vendor_id' => $this->integer(),
             'description' => $this->string(),
             'extra_data' => $this->string(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),

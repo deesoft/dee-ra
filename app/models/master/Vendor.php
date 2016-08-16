@@ -25,6 +25,9 @@ use Yii;
  */
 class Vendor extends \app\classes\ActiveRecord
 {
+    const TYPE_SUPPLIER = 1;
+    const TYPE_CUSTOMER = 2;
+
     /**
      * @inheritdoc
      */
@@ -90,6 +93,11 @@ class Vendor extends \app\classes\ActiveRecord
         return $this->hasOne(VendorDetail::className(), ['id' => 'id']);
     }
 
+    public function getNmType()
+    {
+        return $this->getLogical('type', 'TYPE_');
+    }
+
     /**
      * @inheritdoc
      */
@@ -100,4 +108,6 @@ class Vendor extends \app\classes\ActiveRecord
             'yii\behaviors\BlameableBehavior',
         ];
     }
+
+
 }

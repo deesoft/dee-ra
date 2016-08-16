@@ -26,10 +26,11 @@ use Yii;
  *
  * @property Coa $coa
  * @property Coa $potonganCoa
- * @property PaymentDtl[] $paymentDtls
+ * @property PaymentDtl[] $items
  */
 class Payment extends \app\classes\ActiveRecord
 {
+    public $vendor_name;
 
     /**
      * @inheritdoc
@@ -45,9 +46,9 @@ class Payment extends \app\classes\ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'branch_id', 'vendor_id', 'date', 'method', 'coa_id', 'value', 'status'], 'required'],
+            [['type', 'branch_id', 'vendor_id', 'Date', 'method', 'coa_id', 'value', 'status'], 'required'],
             [['type', 'branch_id', 'vendor_id', 'coa_id', 'potongan_coa_id', 'status'], 'integer'],
-            [['date'], 'safe'],
+            [['date', 'vendor_name'], 'safe'],
             [['value', 'potongan'], 'number'],
             [['!number'], 'autonumber', 'format' => 'formatNumber', 'digit' => '6'],
             [['method'], 'string', 'max' => 32],
@@ -106,8 +107,32 @@ class Payment extends \app\classes\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentDtls()
+    public function getItems()
     {
         return $this->hasMany(PaymentDtl::className(), ['payment_id' => 'id']);
+    }
+
+    public function setItems($values)
+    {
+        $this->loadRelated('items', $values);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return[
+            [
+                'class' => 'mdm\converter\DateConverter',
+                'type' => 'date', // 'date', 'time', 'datetime'
+                'logicalFormat' => 'php:d-m-Y',
+                'attributes' => [
+                    'Date' => 'date', // date is original attribute
+                ]
+            ],
+            'yii\behaviors\BlameableBehavior',
+            'yii\behaviors\TimestampBehavior',
+        ];
     }
 }

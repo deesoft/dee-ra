@@ -11,7 +11,7 @@ return [
     'modules' => [
         'admin' => [
             'class' => 'mdm\admin\Module',
-            'layout'=>'top-menu'
+            'layout' => 'top-menu'
         ]
     ],
     'components' => [
@@ -34,6 +34,7 @@ return [
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
+            'defaultRoles' => ['/*']
         ],
         'session' => [
             'class' => 'yii\web\DbSession'
@@ -44,6 +45,11 @@ return [
                     'class' => 'yii\web\HtmlResponseFormatter',
                     'contentType' => 'text/javascript'
                 ]
+            ]
+        ],
+        'assetManager'=>[
+            'bundles'=>[
+                
             ]
         ]
     ],

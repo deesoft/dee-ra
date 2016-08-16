@@ -6,6 +6,9 @@ use Yii;
 use app\models\master\Warehouse;
 use app\classes\RelatedEvent;
 use app\models\accounting\Invoice;
+use app\models\master\Cogs;
+use app\models\master\ProductStock;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%goods_movement}}".
@@ -165,7 +168,7 @@ class GoodsMovement extends \app\classes\ActiveRecord
         return $model;
     }
 
-    public function applyStock($factor)
+    public function applyStock($factor = 1)
     {
         // update stock
         $wh_id = $this->warehouse_id;
@@ -191,19 +194,42 @@ class GoodsMovement extends \app\classes\ActiveRecord
                 ])->execute()) {
                 return false;
             }
-            if ($item->cogs !== null && $item->cogs !== '') {
-                $paramCogs = [
+            if ($item->cogs !== null && $item->cogs !== '' && !$this->updateCogs([
                     'id' => $product_id,
                     'qty' => $qty,
                     'cogs' => $item->cogs,
-                ];
-                if (!$this->updateCogs($paramCogs)) {
-                    return false;
-                }
+                ])) {
+                return false;
             }
         }
         return true;
     }
+
+    public function updateCogs($params)
+    {
+        $cogs = Cogs::findOne(['product_id' => $params['id']]);
+        if (!$cogs) {
+            $cogs = new Cogs([
+                'product_id' => $params['id'],
+                'cogs' => 0.0
+            ]);
+        }
+
+        if ($cogs->cogs != $params['cogs']) {
+            $current_stock = ProductStock::find()
+                ->where(['product_id' => $params['id']])
+                ->sum('qty');
+            if ($current_stock != 0) {
+                $cogs->cogs += ($params['qty'] * ($params['cogs'] - $cogs->cogs)) / $current_stock;
+            } else {
+                $cogs->cogs = 0;
+            }
+
+            return $cogs->save(false);
+        }
+        return true;
+    }
+
     /**
      * @inheritdoc
      */

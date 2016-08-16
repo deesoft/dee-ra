@@ -4,98 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b55be85c7fedba8ed122d762136817f6",
-    "content-hash": "db0fdb559a39dfc53ae2bd6f0a3ac8b6",
+    "hash": "4994269cc42bd10ddb620bab18d6e021",
+    "content-hash": "a716cb68c2fb3ef302368b0ac15a4c09",
     "packages": [
-        {
-            "name": "almasaeed2010/adminlte",
-            "version": "v2.3.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/almasaeed2010/AdminLTE.git",
-                "reference": "be11566d9539370b196ac85f22a6baf9f42c87cb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/almasaeed2010/AdminLTE/zipball/be11566d9539370b196ac85f22a6baf9f42c87cb",
-                "reference": "be11566d9539370b196ac85f22a6baf9f42c87cb",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Abdullah Almsaeed",
-                    "email": "abdullah@almsaeedstudio.com"
-                }
-            ],
-            "description": "AdminLTE - admin control panel and dashboard that's based on Bootstrap 3",
-            "homepage": "http://almsaeedstudio.com/",
-            "keywords": [
-                "JS",
-                "admin",
-                "back-end",
-                "css",
-                "less",
-                "responsive",
-                "template",
-                "theme",
-                "web"
-            ],
-            "time": "2016-08-04 23:22:06"
-        },
-        {
-            "name": "bower-asset/bootstrap",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "02e9fdaa54521dfc5ff963c803922b7aaeaef47c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/02e9fdaa54521dfc5ff963c803922b7aaeaef47c",
-                "reference": "02e9fdaa54521dfc5ff963c803922b7aaeaef47c",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.9.1,<4.0"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "less/bootstrap.less",
-                    "dist/js/bootstrap.js"
-                ],
-                "bower-asset-ignore": [
-                    "/.*",
-                    "_config.yml",
-                    "CNAME",
-                    "composer.json",
-                    "CONTRIBUTING.md",
-                    "docs",
-                    "js/tests",
-                    "test-infra"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
-            "keywords": [
-                "css",
-                "framework",
-                "front-end",
-                "js",
-                "less",
-                "mobile-first",
-                "responsive",
-                "web"
-            ]
-        },
         {
             "name": "bower-asset/jquery",
             "version": "2.2.4",
@@ -225,39 +136,6 @@
                     "package.json"
                 ]
             }
-        },
-        {
-            "name": "bower-asset/tether",
-            "version": "v1.2.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/HubSpot/tether.git",
-                "reference": "a7ee918947c4ab3d8f91727c08e632aaefcfa3d4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/HubSpot/tether/zipball/a7ee918947c4ab3d8f91727c08e632aaefcfa3d4",
-                "reference": "a7ee918947c4ab3d8f91727c08e632aaefcfa3d4",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "dist/js/tether.js",
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "node_modules",
-                    "bower_components",
-                    "test",
-                    "tests"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "A client-side library to make absolutely positioned elements attach to elements in the page efficiently.",
-            "keywords": [
-                "javascript"
-            ]
         },
         {
             "name": "bower-asset/yii2-pjax",
@@ -544,12 +422,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mdmsoft/yii2-admin.git",
-                "reference": "df46a8c675eb73e7b947a272e86ac0776f7ae880"
+                "reference": "ddc7c0cdcd8f66a09000a6d41e54b5fbab846dc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mdmsoft/yii2-admin/zipball/df46a8c675eb73e7b947a272e86ac0776f7ae880",
-                "reference": "df46a8c675eb73e7b947a272e86ac0776f7ae880",
+                "url": "https://api.github.com/repos/mdmsoft/yii2-admin/zipball/ddc7c0cdcd8f66a09000a6d41e54b5fbab846dc2",
+                "reference": "ddc7c0cdcd8f66a09000a6d41e54b5fbab846dc2",
                 "shasum": ""
             },
             "require": {
@@ -594,7 +472,7 @@
                 "rbac",
                 "yii"
             ],
-            "time": "2016-08-07 02:03:13"
+            "time": "2016-08-09 14:18:45"
         },
         {
             "name": "mdmsoft/yii2-ar-behaviors",
@@ -935,17 +813,59 @@
             "time": "2016-07-09 18:06:48"
         },
         {
+            "name": "twbs/bootstrap",
+            "version": "v3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twbs/bootstrap.git",
+                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/6d03173a1aad98e75f7d33e65b411c519176c59a",
+                "reference": "6d03173a1aad98e75f7d33e65b411c519176c59a",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jacob Thornton",
+                    "email": "jacobthornton@gmail.com"
+                },
+                {
+                    "name": "Mark Otto",
+                    "email": "markdotto@gmail.com"
+                }
+            ],
+            "description": "Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.",
+            "homepage": "http://getbootstrap.com",
+            "keywords": [
+                "bootstrap",
+                "css"
+            ],
+            "time": "2013-12-05 16:09:10"
+        },
+        {
             "name": "yiisoft/yii2",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "33b598f6a62d0c11322300d9f83729381e5b5283"
+                "reference": "e165d4bf1f7cf5eb44b8993a95eae08b406e19bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/33b598f6a62d0c11322300d9f83729381e5b5283",
-                "reference": "33b598f6a62d0c11322300d9f83729381e5b5283",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/e165d4bf1f7cf5eb44b8993a95eae08b406e19bd",
+                "reference": "e165d4bf1f7cf5eb44b8993a95eae08b406e19bd",
                 "shasum": ""
             },
             "require": {
@@ -1026,37 +946,27 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2016-08-08 11:36:08"
+            "time": "2016-08-10 11:46:23"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
-            "version": "2.1.x-dev",
+            "version": "2.0.0-beta",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-bootstrap.git",
-                "reference": "f421a349b1ee94de5cb2805c622f2244a7604db9"
+                "reference": "d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/f421a349b1ee94de5cb2805c622f2244a7604db9",
-                "reference": "f421a349b1ee94de5cb2805c622f2244a7604db9",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4",
+                "reference": "d2518d1f6fb0b3e0e3aba50b9c35f56d580eb3c4",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/bootstrap": "dev-default#48938155eb24b4ccdde09426066869504c6dab3c",
-                "bower-asset/tether": "1.2.*",
-                "yiisoft/yii2": ">=2.0.6"
+                "twbs/bootstrap": "3.0.*",
+                "yiisoft/yii2": "*"
             },
             "type": "yii2-extension",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.x-dev"
-                },
-                "asset-installer-paths": {
-                    "npm-asset-library": "vendor/npm",
-                    "bower-asset-library": "vendor/bower"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "yii\\bootstrap\\": ""
@@ -1069,7 +979,9 @@
             "authors": [
                 {
                     "name": "Qiang Xue",
-                    "email": "qiang.xue@gmail.com"
+                    "email": "qiang.xue@gmail.com",
+                    "homepage": "http://www.yiiframework.com/",
+                    "role": "Founder and project lead"
                 }
             ],
             "description": "The Twitter Bootstrap extension for the Yii framework",
@@ -1077,7 +989,7 @@
                 "bootstrap",
                 "yii2"
             ],
-            "time": "2016-05-08 19:51:27"
+            "time": "2014-04-13 21:58:59"
         },
         {
             "name": "yiisoft/yii2-composer",

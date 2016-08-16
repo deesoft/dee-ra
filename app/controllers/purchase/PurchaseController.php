@@ -117,7 +117,7 @@ class PurchaseController extends Controller
                     if ($model->save() && $model->saveRelation()) {
                         $movement = $model->createGR();
                         $movement->warehouse_id = $model->warehouse_id;
-                        if ($movement->save() && $movement->saveRelation()) {
+                        if ($movement->save() && $movement->saveRelation() && $movement->applyStock()) {
                             $invoice = $movement->createInvoice();
                             
                             if ($model->discount) {

@@ -83,7 +83,7 @@ class m160201_050010_create_table_master extends \yii\db\Migration
             'group_id' => $this->integer()->notNull(),
             'category_id' => $this->integer()->notNull(),
             'name' => $this->string(64)->notNull(),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             'stockable' => $this->boolean()->defaultValue(true),
             // history column
             'created_at' => $this->integer(),
@@ -147,7 +147,7 @@ class m160201_050010_create_table_master extends \yii\db\Migration
             'name' => $this->string(64)->notNull(),
             'contact_name' => $this->string(64),
             'contact_number' => $this->string(64),
-            'status' => $this->integer()->notNull(),
+            'status' => $this->integer(),
             // history column
             'created_at' => $this->integer(),
             'created_by' => $this->integer(),
