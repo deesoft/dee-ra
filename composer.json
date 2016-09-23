@@ -1,12 +1,12 @@
 {
-    "name": "deesoft/yii2-ra",
+    "name": "deesoft/dee-ra",
     "description": "Dee RA (Retail Application)",
     "keywords": ["yii2", "retail", "project template"],
     "type": "project",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "https://github.com/deesoft/yii2-simple-erp/issues?state=open",
-        "source": "https://github.com/deesoft/yii2-simple-erp"
+        "issues": "https://github.com/deesoft/dee-ra/issues?state=open",
+        "source": "https://github.com/deesoft/dee-ra"
     },
     "minimum-stability": "dev",
     "require": {
